@@ -10,7 +10,7 @@ const PanelButton = ({ text, type }) => {
 
   return (
     <div>
-      <button className={css.filledContainer} onClick={toggleOpen} type={type}>
+      <button className={css.filledButton} onClick={toggleOpen} type={type}>
         <h3>{text}</h3>
       </button>
 

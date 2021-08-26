@@ -2,20 +2,23 @@
   --blue-color-4: #75aedc;
   --blue-color-3: #94c6e3;
   --blue-color-2: #9ed8f0;
-  --blue-color-1: #EFFBFF;
-  --blue-color-5: #009DF8;
+  --blue-color-1: #effbff;
+  --blue-color-5: #009df8;
   --blue-color-5-dark: #009df8c7;
-  --blue-color-7: #75AEDC;
-  --green-color-1: #008A5B;
-  --green-color-2: #5DECBA;
+  --blue-color-7: #75aedc;
+  --green-color-1: #008a5b;
+  --green-color-2: #5decba;
 }
-html{
+::-webkit-scrollbar {
+  width: 0;
+}
+html {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 body {
-  margin:  auto;
+  margin: auto;
   width: 300px;
   /* height: 450px; */
   border: 2px solid black;
@@ -23,30 +26,25 @@ body {
   background-color: var(--blue-color-1);
   overflow: hidden;
 }
-button:hover{
-  filter: brightness(0.8);
-}
+img{
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 
-h2, h3 {
+}
+h2,
+h3 {
   margin: 0;
   /* display: inline; */
 }
 
-.header {
-
-  height: 55px;
+.mainImgContainer {
+  margin: 0 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.479);
-  margin: 0;
+  height: 55px;
 }
-
-.header .mainImg {
-
-  padding: 0 20px;
+.mainImgContainer img {
   width: 100%;
-  box-sizing: border-box;
-}
-.header.noBorder{
-  border: none;
 }
 .container {
   display: flex;
@@ -78,23 +76,26 @@ h2, h3 {
   margin: 40px 0;
 }
 
-.filledContainer {
+.filledButton {
   composes: container;
   border: var(--blue-color-4) 2px solid;
-  transition: .1s all;
+  transition: 0.1s all;
   border-radius: 20px;
   width: -webkit-fill-available;
 }
 
-.filledContainer[type="list"] {
+.filledButton[type="list"] {
   background-color: var(--blue-color-2);
 }
-
-.filledContainer:hover {
+.filledButton:hover:active{
+  filter: brightness(0.85);
+}
+.filledButton:hover {
   cursor: pointer;
+  filter: brightness(0.9);
 }
 
-.fullPage {
+.popup {
   background-color: var(--blue-color-2);
   position: absolute;
   margin: 10px;
@@ -103,24 +104,46 @@ h2, h3 {
   left: 0;
   right: 0;
   bottom: 0;
-  animation: popup .3s forwards;
+  animation: popup 0.3s forwards;
+  overflow: hidden;
+}
+.popupHeader{
+  position: absolute;
+  width: 100%;
+
+  background-color: var(--blue-color-2);
+}
+.popupHeader h3{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+.popupContent {
+  box-sizing: border-box;
+  padding-top: 50px;
+  height: 100%;
+  overflow: scroll;
+  width: 100%;
+  overflow-wrap: anywhere;
+
 }
 
 @keyframes popup {
   0% {
-    transform: scale(.7)
+    transform: scale(0.7);
   }
   45% {
-    transform: scale(1.05)
+    transform: scale(1.05);
   }
   80% {
-    transform: scale(.95)
+    transform: scale(0.95);
   }
   100% {
-    transform: scale(1)
+    transform: scale(1);
   }
 }
-.topRight{
+.topRight {
   height: 100%;
   float: right;
   width: auto;

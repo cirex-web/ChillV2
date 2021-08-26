@@ -1,16 +1,13 @@
 /* global chrome */
-import css from './App.module.css';
 import React, { useState, useContext, createContext } from 'react';
 import data from './Storage';
 
 import Header from './components/Header';
-import BlockedList from './components/BlockedList';
 import SiteStatus from './components/SiteStatus';
 import PanelButton from './components/PanelButton';
 
 export const AppContext = createContext();
 function App() {
-  console.log(chrome);
   const [blockedSites, setBlockedSites] = useState(data);
   const [currentSite, setCurrentSite] = useState("example.com"); //TODO:
   const isBlocked = Object.keys(blockedSites).includes(currentSite); //TODO:
