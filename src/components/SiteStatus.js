@@ -3,34 +3,38 @@ import Switch from "react-switch";
 import { useEffect, useRef } from "react";
 
 const SiteStatus = ({ site, isBlocked, toggleCurrentSite }) => {
-  let ref = useRef(null);
-  // let switchRef = useRef(null);
-  // const width = ;
-  // useEffect(()=>{
-  //     switchRef.current.width = width;
-  // },[width]);
   return (
-    <div className={css.container} ref={ref}>
-      <div className={css.wide}>
-        <h2>{site} is </h2>
+    <>
+      <div className={css.container}>
+        <img
+          className={css.containerImg}
+          src="https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico?v=ec617d715196"
+          alt="site favicon"
+        />
+        <div style={{ flexGrow: 1 }}>
+          <h3>{site}</h3>
+          <h2>
+            is&nbsp;
+            {isBlocked ? (
+              <span className={css.blocked}>chilled</span>
+            ) : (
+              <span className={css.unblocked}>unblocked</span>
+            )}
+          </h2>
+        </div>
+      </div>
+      <div className={css.container}>
         {isBlocked ? (
-          <h2 className={css.blocked}>chilled</h2>
+          <button className={css.largeButton} onClick={toggleCurrentSite}>
+            Request to unblock
+          </button>
         ) : (
-          <h2 className={css.unblocked}>unblocked</h2>
+          <button className={css.largeButton} onClick={toggleCurrentSite}>
+            Block this site
+          </button>
         )}
       </div>
-      <label className={css.switch}>
-        <Switch
-          width={150}
-          height={70}
-          uncheckedIcon={false}
-          checkedIcon={false}
-          onChange={toggleCurrentSite}
-          checked={isBlocked}
-        />
-      </label>
-      {/* <div>Toggle site</div> */}
-    </div>
+    </>
   );
 };
 export default SiteStatus;

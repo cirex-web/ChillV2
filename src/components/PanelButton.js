@@ -5,17 +5,17 @@ import Popup from "./Popup";
 const PanelButton = ({ text, type }) => {
   const [open, setOpen] = useState(false);
   const toggleOpen = () => {
-    setOpen(true);
+    setOpen(!open);
   };
 
   return (
-    <div>
+    <>
       <button className={css.filledButton} onClick={toggleOpen} type={type}>
         <h3>{text}</h3>
       </button>
 
-      {open && <Popup type={type}></Popup>}
-    </div>
+      {open && <Popup type={type} toggleOpen={toggleOpen}></Popup>}
+    </>
   );
 };
 export default PanelButton;

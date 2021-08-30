@@ -1,13 +1,11 @@
 :root {
-  --blue-color-4: #75aedc;
-  --blue-color-3: #94c6e3;
-  --blue-color-2: #9ed8f0;
-  --blue-color-1: #effbff;
-  --blue-color-5: #009df8;
-  --blue-color-5-dark: #009df8c7;
-  --blue-color-7: #75aedc;
-  --green-color-1: #008a5b;
-  --green-color-2: #5decba;
+  --blue-color-1: #80d9ff;
+  --blue-color-2: #40C4FF;
+  --blue-color-3: #00B0FF;
+  --blue-color-4: #0091EA;
+  --blue-color-5: #01579B;
+  --green-color-1: #B9F6CA;
+  --green-color-2: #00C853;
 }
 ::-webkit-scrollbar {
   width: 0;
@@ -23,8 +21,8 @@ body {
   /* height: 450px; */
   border: 2px solid black;
   position: relative;
-  background-color: var(--blue-color-1);
   overflow: hidden;
+  font-family: "Source Sans Pro", sans-serif;
 }
 img{
   -webkit-user-select: none;
@@ -37,10 +35,31 @@ h3 {
   margin: 0;
   /* display: inline; */
 }
+h2{
+  font-weight: 600;
+  font-size: 20px;
+}
+h3{
+  font-size: 15px;
+  font-weight: 400;
+}
+button{
+  transition: 0.1s all;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+}
+button:hover:active{
+  filter: brightness(0.85);
+  transform: translate(0,2px);
+}
+button:hover {
+  cursor: pointer;
+  filter: brightness(0.95);
+  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
+}
 
 .mainImgContainer {
-  margin: 0 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.479);
+  padding: 0 20px;
+  background-color: var(--blue-color-2);
   height: 55px;
 }
 .mainImgContainer img {
@@ -52,48 +71,47 @@ h3 {
   flex-wrap: wrap;
   justify-content: center;
   padding: 10px;
+  gap: 15px;
 }
 
-.large {
-  font-size: 50px;
-}
 
+.containerImg{
+  border-radius: 4px;
+  width: 40px;
+  box-sizing: border-box;
+  border: 2px solid black;
+}
 .blocked {
-  composes: large;
   color: var(--blue-color-5);
 }
 
 .unblocked {
-  color: var(--green-color-1);
-  composes: large;
+  color: var(--green-color-2);
 }
 
-.wide {
+
+.largeButton{
+  border: 1px solid var(--blue-color-3);
+  background-color: var(--blue-color-2);
+  border-radius: 30px;
   width: 100%;
-}
-
-.switch {
-  margin: 40px 0;
+  font-size: 20px;
+  padding: 20px;
 }
 
 .filledButton {
-  composes: container;
   border: var(--blue-color-4) 2px solid;
-  transition: 0.1s all;
   border-radius: 20px;
   width: -webkit-fill-available;
+  padding: 10px;
 }
 
 .filledButton[type="list"] {
   background-color: var(--blue-color-2);
 }
-.filledButton:hover:active{
-  filter: brightness(0.85);
-}
-.filledButton:hover {
-  cursor: pointer;
-  filter: brightness(0.9);
-}
+
+
+/* popup stuff */
 
 .popup {
   background-color: var(--blue-color-2);
@@ -147,6 +165,49 @@ h3 {
   height: 100%;
   float: right;
   width: auto;
-  padding: 13px;
+  padding: 3px;
+  margin: 10px;
+
   box-sizing: border-box;
+}
+.closeButton{
+  composes: topRight;
+}
+.closeButton:hover{
+  cursor: pointer;
+}
+
+
+/* tab */
+.tab{
+  transition: .2s all;
+  flex-grow: 1;
+  position: relative;
+  text-align: center;
+  height: 30px;
+  color: rgba(0, 0, 0, 0.486);
+  font-size: 15px;
+}
+.tab:hover{
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.664);
+}
+
+.tab::after{
+  transition: .2s all;
+  content: "";
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  bottom: 0px;
+  left: 0;
+  background-color: var(--blue-color-5);
+  opacity: 0;
+}
+.activeTab{
+  color: black !important;
+  composes: tab;
+}
+.activeTab::after{
+  opacity: 1;
 }

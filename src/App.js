@@ -1,39 +1,54 @@
 /* global chrome */
-import React, { useState, useContext, createContext } from 'react';
-import data from './Storage';
+import React, { useState, createContext } from "react";
+import data from "./Storage";
 
-import Header from './components/Header';
-import SiteStatus from './components/SiteStatus';
-import PanelButton from './components/PanelButton';
-
+import Header from "./components/Header";
+import SiteStatus from "./components/SiteStatus";
+import NavButtons from "./components/NavButtons";
+import NavBar from "./NavBar";
+import css from "./App.module.css";
 export const AppContext = createContext();
 function App() {
   const [blockedSites, setBlockedSites] = useState(data);
   const [currentSite, setCurrentSite] = useState("example.com"); //TODO:
+  const [page, setPage] = useState(0);
   const isBlocked = Object.keys(blockedSites).includes(currentSite); //TODO:
   // setBlockedSites(data);
   // setBlockedSites({hey:3});
   const toggleCurrentSite = () => {
-
-    if(!isBlocked){
+    if (!isBlocked) {
       blockedSites[currentSite] = {}; //TODO:
-
-    }else{
+    } else {
       delete blockedSites[currentSite];
     }
-    setBlockedSites({...blockedSites});
-  }
+    setBlockedSites({ ...blockedSites });
+  };
+
+  const pageComponent = (page) => {
+    switch (page) {
+      case 0:
+        return (
+          <SiteStatus
+            site={currentSite}
+            isBlocked={isBlocked}
+            toggleCurrentSite={toggleCurrentSite}
+          />
+        );
+      default:
+        return <div className={css.container}>
+          404 Page Not Found
+        </div>;
+    }
+  };
   return (
     <AppContext.Provider value={blockedSites}>
-        <Header/>
+      <Header />
+      <NavBar page={page} setPage={setPage} />
+      {pageComponent(page)}
 
-        <SiteStatus site={currentSite} isBlocked = {isBlocked} toggleCurrentSite = {toggleCurrentSite}/>
-        <PanelButton text={"View all blocked sites"} type="list"/>
-        <PanelButton text={"Show stats"} type="stats"/>
-
+      {/* <NavButtons /> */}
     </AppContext.Provider>
   );
 }
-
 
 export default App;
