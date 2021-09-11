@@ -1,15 +1,14 @@
-import css from "../App.module.css";
-import Switch from "react-switch";
-import { useEffect, useRef } from "react";
+import css from "../../App.module.css";
 
-const SiteStatus = ({ site, isBlocked, toggleCurrentSite }) => {
+
+const CurrentSite = ({ site, isBlocked, toggleCurrentSite }) => {
   return (
     <>
       <div className={css.container}>
         <img
-          className={css.containerImg}
-          src="https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico?v=ec617d715196"
-          alt="site favicon"
+          className={css.faviconLarge}
+          src={`https://api.faviconkit.com/${site}/144`}
+          alt=""
         />
         <div style={{ flexGrow: 1 }}>
           <h3>{site}</h3>
@@ -37,4 +36,4 @@ const SiteStatus = ({ site, isBlocked, toggleCurrentSite }) => {
     </>
   );
 };
-export default SiteStatus;
+export default CurrentSite;

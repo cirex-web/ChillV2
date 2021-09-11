@@ -1,12 +1,15 @@
 :root {
   --blue-color-1: #80d9ff;
-  --blue-color-2: #40C4FF;
-  --blue-color-3: #00B0FF;
-  --blue-color-4: #0091EA;
-  --blue-color-5: #01579B;
-  --green-color-1: #B9F6CA;
-  --green-color-2: #00C853;
+  --blue-color-2: #40c4ff;
+  --blue-color-3: #00b0ff;
+  --blue-color-4: #0091ea;
+  --blue-color-5: #01579b;
+  --green-color-1: #b9f6ca;
+  --green-color-2: #00c853;
+  --light-gray: rgba(0, 0, 0, 0.12);
+  --dark-gray: rgba(0, 0, 0, 0.5);
 }
+
 ::-webkit-scrollbar {
   width: 0;
 }
@@ -18,49 +21,58 @@ html {
 body {
   margin: auto;
   width: 300px;
-  /* height: 450px; */
   border: 2px solid black;
   position: relative;
   overflow: hidden;
+
   font-family: "Source Sans Pro", sans-serif;
 }
-img{
+img {
   -webkit-user-select: none;
   user-select: none;
   -webkit-user-drag: none;
-
 }
+input.main {
+  left: 0;
+  margin: 0 20px;
+  position: sticky;
+  font-size: 15px;
+  padding: 5px;
+  top: 0;
+  right: 0;
+  width: -webkit-fill-available;
+}
+
 h2,
 h3 {
   margin: 0;
   /* display: inline; */
 }
-h2{
+h2 {
   font-weight: 600;
   font-size: 20px;
 }
-h3{
+h3 {
   font-size: 15px;
   font-weight: 400;
 }
-button{
+button {
   transition: 0.1s all;
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); */
 }
-button:hover:active{
+button:hover:active {
   filter: brightness(0.85);
-  transform: translate(0,2px);
+  transform: translate(0, 2px);
 }
 button:hover {
   cursor: pointer;
   filter: brightness(0.95);
-  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
 }
 
 .mainImgContainer {
   padding: 0 20px;
-  background-color: var(--blue-color-2);
   height: 55px;
+  border-bottom: 1px solid var(--blue-color-5);
 }
 .mainImgContainer img {
   width: 100%;
@@ -72,14 +84,47 @@ button:hover {
   justify-content: center;
   padding: 10px;
   gap: 15px;
+  overflow-wrap: anywhere;
 }
 
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.rowData {
+  justify-content: center;
+  flex-grow: 1;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.row img {
+  height: 20px;
+  width: 20px;
+  
+}
+.row img:hover{
+  cursor: pointer;
+}
 
-.containerImg{
-  border-radius: 4px;
+.rowUrl {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 200;
+  flex-shrink: 1;
+}
+.faviconLarge {
   width: 40px;
-  box-sizing: border-box;
-  border: 2px solid black;
+  padding-right: 10px;
+  border-right: 2px solid var(--dark-gray);
+  height: 40px;
+  overflow: hidden;
 }
 .blocked {
   color: var(--blue-color-5);
@@ -89,16 +134,18 @@ button:hover {
   color: var(--green-color-2);
 }
 
-
-.largeButton{
-  border: 1px solid var(--blue-color-3);
-  background-color: var(--blue-color-2);
-  border-radius: 30px;
+.largeButton {
+  border: 2px solid var(--dark-gray);
+  border-radius: 5px;
+  background-color: white;
   width: 100%;
   font-size: 20px;
   padding: 20px;
 }
 
+.largeButton:hover {
+  background-color: var(--blue-color-1);
+}
 .filledButton {
   border: var(--blue-color-4) 2px solid;
   border-radius: 20px;
@@ -109,7 +156,6 @@ button:hover {
 .filledButton[type="list"] {
   background-color: var(--blue-color-2);
 }
-
 
 /* popup stuff */
 
@@ -125,17 +171,17 @@ button:hover {
   animation: popup 0.3s forwards;
   overflow: hidden;
 }
-.popupHeader{
+.popupHeader {
   position: absolute;
   width: 100%;
 
   background-color: var(--blue-color-2);
 }
-.popupHeader h3{
+.popupHeader h3 {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
 }
 .popupContent {
   box-sizing: border-box;
@@ -144,7 +190,6 @@ button:hover {
   overflow: scroll;
   width: 100%;
   overflow-wrap: anywhere;
-
 }
 
 @keyframes popup {
@@ -170,17 +215,16 @@ button:hover {
 
   box-sizing: border-box;
 }
-.closeButton{
+.closeButton {
   composes: topRight;
 }
-.closeButton:hover{
+.closeButton:hover {
   cursor: pointer;
 }
 
-
 /* tab */
-.tab{
-  transition: .2s all;
+.tab {
+  transition: 0.2s all;
   flex-grow: 1;
   position: relative;
   text-align: center;
@@ -188,13 +232,13 @@ button:hover {
   color: rgba(0, 0, 0, 0.486);
   font-size: 15px;
 }
-.tab:hover{
+.tab:hover {
   cursor: pointer;
   color: rgba(0, 0, 0, 0.664);
 }
 
-.tab::after{
-  transition: .2s all;
+.tab::after {
+  transition: 0.2s all;
   content: "";
   position: absolute;
   height: 2px;
@@ -203,11 +247,12 @@ button:hover {
   left: 0;
   background-color: var(--blue-color-5);
   opacity: 0;
+  border-radius: 5px;
 }
-.activeTab{
+.activeTab {
   color: black !important;
   composes: tab;
 }
-.activeTab::after{
+.activeTab::after {
   opacity: 1;
 }
