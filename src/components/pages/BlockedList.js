@@ -9,7 +9,7 @@ let BlockedList = () => {
     <>
       <input className={css.main}/>
     
-      <div className={css.container} style={{gap:"5px"}}>
+      <div className={css.container} style={{gap:"0px"}}>
         {Object.entries(data).map(([url,info],i)=>{
           return(<SiteRow url={url} siteData={info} key={i}/>)
         })}

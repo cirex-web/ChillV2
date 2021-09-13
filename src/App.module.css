@@ -94,6 +94,16 @@ button:hover {
   gap: 10px;
   font-size: 15px;
   white-space: nowrap;
+  border-bottom: 1px var(--light-gray) solid;
+  padding: 5px 0;
+  color: var(--dark-gray);
+}
+.row:hover{
+  color:black;
+  cursor: pointer;
+}
+.row:last-child{
+  border: none;
 }
 .rowData {
   justify-content: center;
