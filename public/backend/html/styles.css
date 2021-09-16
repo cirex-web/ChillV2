@@ -1,0 +1,155 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #aee1ec;
+    margin: 0;
+    font-family: Optima;
+    /* opacity: 1 !important; */
+}
+img{
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    height: 50px;
+}
+h1 {
+    font-family: 'Mate SC', sans-serif;
+    font-size: 60px;
+    font-weight: 100;
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+h1.bigger {
+    font-size: 100px;
+}
+
+h1.smaller {
+    font-size: 30px;
+}
+
+h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 40px;
+    width: fit-content;
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: normal;
+}
+
+h2.quote {
+    font-size: 20px;
+    overflow-wrap: anywhere;
+    background: #ffffff;
+}
+
+p {
+    margin: 0;
+    font-size: 20px;
+}
+#bg{
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    min-width: 100%;
+    min-height: 100%;
+    -webkit-user-drag: none;
+}
+.screen {
+    display: none;
+    position: absolute;
+    text-align: center;
+    opacity: 0;
+    transition: 1s all;
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, .15);
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.screen.visible {
+    display: block;
+    opacity: 1;
+}
+
+.q {
+    transition: .2s all;
+    opacity: 0;
+    display: none;
+}
+
+input {
+    margin-right: 20px;
+    width: 30ex;
+}
+
+input.small {
+    /* margin-right: 3.5ex; */
+    margin-right: 0px;
+    width: 3ex;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+span{
+    margin-right: 5px;
+}
+
+button,
+input{
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    box-sizing: content-box;
+    outline: none;
+    font-size: 20px;
+    border: none;
+    transition: .3s all;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+button:hover{
+    cursor: pointer;
+    box-shadow: 0px 0px 3px 0px black;
+}
+.suffix{
+    display: inline;
+    padding: 10px 15px;
+    font-size: 20px;
+    color: #555;
+    background-color: #eee;
+    box-sizing: content-box;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-right: 10px;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+.choice {
+    margin: 0 20px;
+    font-weight: bold;
+    transition: .3s all;
+    font-size: 60px;
+    font-family: 'Mate SC', sans-serif;
+}
+
+.choice:hover {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+#yes {
+    color: green;
+}
+
+#no {
+    color: red;
+}
+
+#decision-container {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}

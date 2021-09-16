@@ -1,10 +1,26 @@
 {
-    "name": "Chill",
-    "description": "Rebuilt with React",
-    "version": "0.1",
-    "manifest_version": 2,
-    "browser_action": {
-      "default_popup": "index.html",
-      "default_title": "Open the popup"
-    }
+  "name": "Chill - Browse With Purpose",
+  "description": "Extension that aims to reduce impulsive procrastination by forcing users to stop and re-examine the reasons they want to procrastinate.",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "background": {
+      "scripts": ["backend/scripts/background.js"],
+      "persistent": false
+  },
+  "permissions": ["activeTab", "storage", "unlimitedStorage"],
+  "browser_action": {
+      "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [{
+      "js": ["external/jquery.js", "backend/scripts/page-script.js"],
+      "matches": ["http://*/*", "https://*/*"],
+      "run_at": "document_start"
+  }],
+  "web_accessible_resources": [
+      "*"
+  ],
+  "icons": {
+      "128": "assets/128.png",
+      "48": "assets/48.png"
   }
+}

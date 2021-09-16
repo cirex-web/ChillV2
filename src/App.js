@@ -1,6 +1,5 @@
-/* global chrome */
 import React, { useState, createContext } from "react";
-import data from "./Storage";
+import useStorage from "./useStorage";
 
 import CurrentSite from "./components/pages/CurrentSite";
 import NavBar from "./NavBar";
@@ -9,30 +8,23 @@ import BlockedList from "./components/pages/BlockedList";
 import Stats from "./components/pages/Stats";
 
 export const AppContext = createContext();
+function showMessage(data){
+  console.log("Message",data);
+}
 function App() {
-  const [blockedSites, setBlockedSites] = useState(data);
-  const [currentSite, setCurrentSite] = useState("google.com"); //TODO:
+  const {currentSiteUrl,blockedSites,blockSite} = useStorage(showMessage);
   const [page, setPage] = useState(0);
-  const isBlocked = Object.keys(blockedSites).includes(currentSite); //TODO:
-  // setBlockedSites(data);
-  // setBlockedSites({hey:3});
-  const toggleCurrentSite = () => {
-    if (!isBlocked) {
-      blockedSites[currentSite] = {}; //TODO:
-    } else {
-      delete blockedSites[currentSite];
-    }
-    setBlockedSites({ ...blockedSites });
-  };
+  const isBlocked = blockedSites&&currentSiteUrl&&Object.keys(blockedSites).includes(currentSiteUrl); //TODO:
+  console.log(currentSiteUrl,blockedSites);
 
   const pageComponent = (page) => {
     switch (page) {
       case 0:
         return (
           <CurrentSite
-            site={currentSite}
+            site={currentSiteUrl}
             isBlocked={isBlocked}
-            toggleCurrentSite={toggleCurrentSite}
+            toggleCurrentSite={()=>{blockSite(currentSiteUrl)}}
           />
         );
       case 1:
@@ -53,7 +45,6 @@ function App() {
       <NavBar page={page} setPage={setPage} />
       <div style={{ overflow: "scroll", maxHeight: "300px" }}>{pageComponent(page)}</div>
 
-      {/* <NavButtons /> */}
     </AppContext.Provider>
   );
 }
