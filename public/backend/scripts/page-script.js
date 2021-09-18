@@ -87,10 +87,10 @@ function beginBlock(style) {
     const blockPageTemplate = '<html><head><title>Chilled!</title></head><body style="display:none !important;"></body></html>';
     document.documentElement.innerHTML = blockPageTemplate; 
     
-    $("body").load(chrome.runtime.getURL("/src/backend/html/blocked.html"), async() => {
+    $("body").load(chrome.runtime.getURL("backend/html/blocked.html"), async() => {
         // Doesn't load input field but here's the css import
         
-        var cssURL = chrome.runtime.getURL("/src/backend/html/styles.css");
+        var cssURL = chrome.runtime.getURL("backend/html/styles.css");
         var newstyle = document.createElement("link"); // Create a new link Tag
         newstyle.setAttribute("rel", "stylesheet");
         newstyle.setAttribute("type", "text/css");

@@ -33,12 +33,17 @@ let SiteRow = ({ url, siteData }) => {
   }
   const [timer, setTimer] = useState(time - new Date());
   useEffect(() => {
-    if (timer) {
+    if (timer&&timer>=0) {
       setTimeout(() => {
         setTimer(time - new Date());
       }, 100);
     }
   }, [timer, setTimer, time]);
+  useEffect(()=>{
+    return ()=>{
+      setTimer(0);
+    }
+  },[]);
   return (
     <div className={css.row}>
       <a href={`https://${url}`} style={{ height: "20px" }}>

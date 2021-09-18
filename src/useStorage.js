@@ -11,7 +11,7 @@ let data = {
       currently_blocked: true,
       date_blocked: 1622566475429,
       request: {
-        end_time: 1631393287202,
+        end_time: +new Date() + 20 * 1000,
         message: "sgfdfgsdfgsdgdsfgdfsgdfgsdfgsdfgsdgsdfg",
         reward_time: 2606640000,
         time_created: 1622566548493,
@@ -20,7 +20,7 @@ let data = {
     "x.com": {
       currently_blocked: false,
       date_blocked: 1622494132514,
-      reblock: 1631393912406,
+      reblock: +new Date() + 20 * 1000,
     },
     "y.co": {
       currently_blocked: true,
@@ -42,7 +42,7 @@ const getURL = function () {
     }
   });
 };
-const useStorage = ({ showMessage }) => {
+const useStorage = (showMessage ) => {
   let [blockedSites, setBlockedSites] = useState(undefined);
   let [currentSiteUrl, setCurrentSiteUrl] = useState(undefined);
   const listenForUpdates = () => {
@@ -77,23 +77,32 @@ const useStorage = ({ showMessage }) => {
       }
     });
   };
-  const init = async () => {
-    console.log("ca");
-    setBlockedSites(await getDataFromKey("blocked_sites"));
-    setCurrentSiteUrl(await getURL());
-    listenForUpdates();
-  };
 
   const blockSite = function (URL) {
+    
     sendMessage("block_site", {
       URL: URL,
     });
   };
-  init();
+  const unblockSite = (URL) => {
+    showMessage("blocked!");
+    sendMessage("unblock_site", {
+      URL: URL,
+    });
+  };
+  useEffect(() => {
+    const init = async () => {
+      setBlockedSites(await getDataFromKey("blocked_sites"));
+      setCurrentSiteUrl(await getURL());
+      listenForUpdates();
+    };
+    init();
+  }, []);
   return {
     currentSiteUrl,
     blockedSites,
     blockSite,
+    unblockSite,
   };
 };
 export default useStorage;

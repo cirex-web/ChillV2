@@ -8,6 +8,8 @@
   --green-color-2: #00c853;
   --light-gray: rgba(0, 0, 0, 0.12);
   --dark-gray: rgba(0, 0, 0, 0.5);
+
+  --toastify-toast-width: 30px;
 }
 
 ::-webkit-scrollbar {

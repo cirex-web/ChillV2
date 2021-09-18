@@ -4,23 +4,19 @@
   "version": "1.0.0",
   "manifest_version": 2,
   "background": {
-      "scripts": ["backend/scripts/background.js"],
-      "persistent": false
+    "scripts": ["backend/scripts/background.js"],
+    "persistent": false
   },
   "permissions": ["activeTab", "storage", "unlimitedStorage"],
   "browser_action": {
-      "default_popup": "popup/popup.html"
+    "default_popup": "index.html"
   },
-  "content_scripts": [{
+  "content_scripts": [
+    {
       "js": ["external/jquery.js", "backend/scripts/page-script.js"],
       "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_start"
-  }],
-  "web_accessible_resources": [
-      "*"
+    }
   ],
-  "icons": {
-      "128": "assets/128.png",
-      "48": "assets/48.png"
-  }
+  "web_accessible_resources": ["*"]
 }

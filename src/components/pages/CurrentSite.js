@@ -11,7 +11,7 @@ const CurrentSite = ({ site, isBlocked, toggleCurrentSite }) => {
           alt=""
         />
         <div style={{ flexGrow: 1 }}>
-          <h3>{site}</h3>
+          <h3>{site??"Loading..."}</h3>
           <h2>
             is&nbsp;
             {isBlocked ? (
