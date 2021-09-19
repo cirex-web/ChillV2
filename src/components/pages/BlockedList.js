@@ -13,11 +13,10 @@ let BlockedList = () => {
       </div>
 
       <div className={css.container} style={{ gap: "0px" }}>
-        {Object.entries(data).map(([url, info], i) => {
-          return <SiteRow url={url} siteData={info} key={i} />;
+        {Object.entries(data).map((siteEntry, i) => {
+          return <SiteRow siteEntry={siteEntry} key={i} />;
         })}
       </div>
-      {/* <div className={css.container}>{JSON.stringify(data)}</div> */}
     </>
   );
 };

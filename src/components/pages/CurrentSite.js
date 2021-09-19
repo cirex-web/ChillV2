@@ -1,37 +1,31 @@
 import css from "../../App.module.css";
+import useSite from "../../useSite";
 
-
-const CurrentSite = ({ site, isBlocked, toggleCurrentSite }) => {
+const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite }) => {
+  const { url, status, color } = useSite([siteUrl, siteData]);
+  const isBlocked = !!siteData;
   return (
     <>
       <div className={css.container}>
         <img
           className={css.faviconLarge}
-          src={`https://api.faviconkit.com/${site}/144`}
+          src={`https://api.faviconkit.com/${url}/144`}
           alt=""
         />
         <div style={{ flexGrow: 1 }}>
-          <h3>{site??"Loading..."}</h3>
+          <h3>{url}</h3>
           <h2>
-            is&nbsp;
-            {isBlocked ? (
-              <span className={css.blocked}>chilled</span>
-            ) : (
-              <span className={css.unblocked}>unblocked</span>
-            )}
+            is&nbsp;<span style={{ color: color }}>{status.toLowerCase()}</span>
           </h2>
         </div>
       </div>
       <div className={css.container}>
-        {isBlocked ? (
-          <button className={css.largeButton} onClick={toggleCurrentSite}>
-            Request to unblock
-          </button>
-        ) : (
-          <button className={css.largeButton} onClick={toggleCurrentSite}>
-            Block this site
-          </button>
-        )}
+        <button
+          className={css.largeButton}
+          onClick={() => toggleCurrentSite(isBlocked)}
+        >
+          {isBlocked ? "Request to unblock" : "Block Site"}
+        </button>
       </div>
     </>
   );

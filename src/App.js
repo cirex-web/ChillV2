@@ -6,9 +6,9 @@ import NavBar from "./NavBar";
 import css from "./App.module.css";
 import BlockedList from "./components/pages/BlockedList";
 import Stats from "./components/pages/Stats";
+import toast, { Toaster } from 'react-hot-toast';
 
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+
 
 export const AppContext = createContext();
 function showMessage(data) {
@@ -18,20 +18,15 @@ function App() {
   const { currentSiteUrl, blockedSites, blockSite, unblockSite } =
     useStorage(showMessage);
   const [page, setPage] = useState(0);
-  const isBlocked =
-    blockedSites &&
-    currentSiteUrl &&
-    Object.keys(blockedSites).includes(currentSiteUrl) &&
-    blockedSites[currentSiteUrl].currently_blocked; //TODO: Fix
-
+  
   const pageComponent = (page) => {
     switch (page) {
       case 0:
         return (
           <CurrentSite
-            site={currentSiteUrl}
-            isBlocked={isBlocked}
-            toggleCurrentSite={() => {
+            siteUrl={currentSiteUrl}
+            siteData={blockedSites&&blockedSites[currentSiteUrl]}
+            toggleCurrentSite={(isBlocked) => {
               if (isBlocked) {
                 unblockSite(currentSiteUrl);
               } else {
@@ -50,7 +45,7 @@ function App() {
   };
   return (
     <AppContext.Provider value={blockedSites}>
-      <ToastContainer />
+      <Toaster position="top-right" gutter={8}/>
       <div className={css.header}>
         <div className={css.mainImgContainer}>
           <img src="../assets/chillLogo2.png" alt="img logo" />

@@ -139,13 +139,7 @@ button:hover {
   height: 40px;
   overflow: hidden;
 }
-.blocked {
-  color: var(--blue-color-5);
-}
 
-.unblocked {
-  color: var(--green-color-2);
-}
 
 .largeButton {
   border: 2px solid var(--dark-gray);

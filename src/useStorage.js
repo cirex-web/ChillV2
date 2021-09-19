@@ -1,7 +1,8 @@
 /* global chrome */
 import React, { useEffect, useState, useCallback } from "react";
+import useSite from "./useSite";
 
-let data = {
+const data = {
   blocked_sites: {
     "discord.com": {
       currently_blocked: true,
@@ -11,7 +12,7 @@ let data = {
       currently_blocked: true,
       date_blocked: 1622566475429,
       request: {
-        end_time: +new Date() + 20 * 1000,
+        end_time: +new Date() - 20 * 1000,
         message: "sgfdfgsdfgsdgdsfgdfsgdfgsdfgsdfgsdgsdfg",
         reward_time: 2606640000,
         time_created: 1622566548493,
@@ -38,7 +39,7 @@ const getURL = function () {
         });
       });
     } else {
-      re("discord.com");
+      re("xg.com");
     }
   });
 };
@@ -85,7 +86,7 @@ const useStorage = (showMessage ) => {
     });
   };
   const unblockSite = (URL) => {
-    showMessage("blocked!");
+    showMessage("unblock!");
     sendMessage("unblock_site", {
       URL: URL,
     });
@@ -98,6 +99,7 @@ const useStorage = (showMessage ) => {
     };
     init();
   }, []);
+
   return {
     currentSiteUrl,
     blockedSites,
