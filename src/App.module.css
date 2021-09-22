@@ -9,7 +9,6 @@
   --light-gray: rgba(0, 0, 0, 0.12);
   --dark-gray: rgba(0, 0, 0, 0.5);
 
-  --toastify-toast-width: 30px;
 }
 
 ::-webkit-scrollbar {
@@ -26,7 +25,6 @@ body {
   border: 2px solid black;
   position: relative;
   overflow: hidden;
-
   font-family: "Source Sans Pro", sans-serif;
 }
 img {
@@ -44,6 +42,23 @@ img {
   top: 0;
   right: 0;
   width: -webkit-fill-available;
+  border: 2px solid var(--dark-gray);
+  padding: 2px 5px;
+  border-radius: 10px;
+  background-color: white;
+  color: gray;
+}
+.mainHeader input{
+  border: none;
+  outline: none;
+  
+}
+.mainHeader:focus-within{
+  border-color: var(--blue-color-5);
+  color: black;
+}
+.mainHeader span:hover{
+  cursor: pointer;
 }
 
 h2,

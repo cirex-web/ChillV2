@@ -1,6 +1,5 @@
 /* global chrome */
-import React, { useEffect, useState, useCallback } from "react";
-import useSite from "./useSite";
+import { useEffect, useState } from "react";
 
 const data = {
   blocked_sites: {
@@ -60,6 +59,10 @@ const useStorage = (showMessage ) => {
     data.type = type;
     console.log("sending", type, data);
     if (!chrome.runtime) {
+      showMessage({
+        success: Math.random()>0.5,
+        message: type
+      })
       return;
     }
     chrome.runtime.sendMessage(data, function (response) {
@@ -86,7 +89,6 @@ const useStorage = (showMessage ) => {
     });
   };
   const unblockSite = (URL) => {
-    showMessage("unblock!");
     sendMessage("unblock_site", {
       URL: URL,
     });

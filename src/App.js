@@ -12,7 +12,12 @@ import toast, { Toaster } from 'react-hot-toast';
 
 export const AppContext = createContext();
 function showMessage(data) {
-  toast.success(data);
+  if(data.success){
+
+    toast.success(data.message);
+  }else{
+    toast.error(data.message);
+  }
 }
 function App() {
   const { currentSiteUrl, blockedSites, blockSite, unblockSite } =
@@ -36,7 +41,7 @@ function App() {
           />
         );
       case 1:
-        return <BlockedList />;
+        return <BlockedList blockSite={blockSite}/>;
       case 2:
         return <Stats />;
       default:
