@@ -6,31 +6,33 @@ import NavBar from "./NavBar";
 import css from "./App.module.css";
 import BlockedList from "./components/pages/BlockedList";
 import Stats from "./components/pages/Stats";
-import toast, { Toaster } from 'react-hot-toast';
-
-
+import toast, { Toaster } from "react-hot-toast";
 
 export const AppContext = createContext();
 function showMessage(data) {
-  if(data.success){
-
+  if (data.success) {
     toast.success(data.message);
-  }else{
+  } else {
     toast.error(data.message);
   }
 }
 function App() {
-  const { currentSiteUrl, blockedSites, blockSite, unblockSite } =
-    useStorage(showMessage);
+  const {
+    currentSiteUrl,
+    blockedSites,
+    blockSite,
+    unblockSite,
+    siteBlockable,
+  } = useStorage(showMessage);
   const [page, setPage] = useState(0);
-  
+
   const pageComponent = (page) => {
     switch (page) {
       case 0:
         return (
           <CurrentSite
             siteUrl={currentSiteUrl}
-            siteData={blockedSites&&blockedSites[currentSiteUrl]}
+            siteData={blockedSites && blockedSites[currentSiteUrl]}
             toggleCurrentSite={(isBlocked) => {
               if (isBlocked) {
                 unblockSite(currentSiteUrl);
@@ -38,10 +40,11 @@ function App() {
                 blockSite(currentSiteUrl);
               }
             }}
+            siteBlockable={siteBlockable}
           />
         );
       case 1:
-        return <BlockedList blockSite={blockSite}/>;
+        return <BlockedList blockSite={blockSite} />;
       case 2:
         return <Stats />;
       default:
@@ -50,7 +53,7 @@ function App() {
   };
   return (
     <AppContext.Provider value={blockedSites}>
-      <Toaster position="top-right" gutter={8}/>
+      <Toaster position="top-right" gutter={8} />
       <div className={css.header}>
         <div className={css.mainImgContainer}>
           <img src="../assets/chillLogo2.png" alt="img logo" />

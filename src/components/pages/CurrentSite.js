@@ -1,9 +1,10 @@
 import css from "../../App.module.css";
 import useSite from "../../useSite";
 
-const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite }) => {
+const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite,siteBlockable }) => {
   const { url, status, color } = useSite([siteUrl, siteData]);
   const isBlocked = !!siteData;
+  // console.log(siteBlockable);
   return (
     <>
       <div className={css.container}>
@@ -23,6 +24,7 @@ const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite }) => {
         <button
           className={css.largeButton}
           onClick={() => toggleCurrentSite(isBlocked)}
+          disabled={!siteBlockable}
         >
           {isBlocked ? "Request to unblock" : "Block Site"}
         </button>

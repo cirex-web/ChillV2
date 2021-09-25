@@ -1,4 +1,3 @@
-import react from 'react';
 import css from "./App.module.css";
 const NavBar = ({page, setPage}) =>{
     return <div className={css.container} style={{gap:0}}>

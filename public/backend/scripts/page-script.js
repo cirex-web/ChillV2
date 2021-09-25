@@ -156,7 +156,7 @@ function setUpForm() {
 
     $("#send-request-button").on('click', (ev) => {
         let time = $(ev.target).parent().find("input").val();
-        if (time != "" && !isNaN(time)) {
+        if (time !== "" && !isNaN(time)) {
             time = parseFloat(time);
             sendMessage("add_request", {
                 URL: url,
@@ -191,7 +191,7 @@ function beginCountdown() {
             return;
         }
         let str = createTimeString(dif);
-        if (prev != str) {
+        if (prev !== str) {
             prev = str;
             $("#time").html(str);
         }
