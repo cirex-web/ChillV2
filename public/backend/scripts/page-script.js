@@ -2,11 +2,11 @@
 /* global chrome */
 /* global $ */
 
-let blocked_sites, site, url;
+let blocked_sites, site_data, url;
 getBlockedSites().then((res) => {
     blocked_sites = res;
-    url = new URL(location.href).hostname.replace("www.","");
-    site = blocked_sites[url];
+    url = new URL(location.href).origin.replace("http://", "https://").replace("https://www.","https://");
+    site_data = blocked_sites[url];
     main();
 });
 
@@ -37,18 +37,13 @@ function addStorageListener() {
     chrome.storage.onChanged.addListener(function(changes) {
         for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
             if (key === "blocked_sites") {
-                console.log(oldValue, newValue);
-                if (!oldValue) {
+                if (!oldValue||!newValue) {
                     location.reload();
                 } else {
 
                     let old_site = oldValue[url];
                     let new_site = newValue[url];
-                    if (!old_site && new_site) {
-                        location.reload();
-                    } else if (old_site.currently_blocked != new_site.currently_blocked) {
-                        location.reload();
-                    } else if (!!old_site.request != !!new_site.request) {
+                    if (JSON.stringify(old_site)!==JSON.stringify(new_site)) {
                         location.reload();
                     }
                 }
@@ -70,11 +65,11 @@ function getBlockedSites() {
 }
 
 function siteBlocked() {
-    console.log(site);
-    if (!site || (site && !site.currently_blocked && site.reblock > +new Date())) {
+    console.log(site_data);
+    if (!site_data || (site_data && !site_data.currently_blocked && site_data.reblock > +new Date())) {
         return false;
     } else {
-        if(site.reblock <= +new Date()){
+        if(site_data.reblock <= +new Date()){
             sendMessage("block_site", { URL: url });
         }
         return true;
@@ -100,10 +95,10 @@ function beginBlock(style) {
         }
         document.getElementsByTagName("body")[0].appendChild(newstyle);
 
-        if (site.request) {
+        if (site_data.request) {
             //check if it's outdated already
-            if (new Date() >= site.request.end_time) {
-                $("#message").html("\"" + site.request.message + "\"");
+            if (new Date() >= site_data.request.end_time) {
+                $("#message").html("\"" + site_data.request.message + "\"");
                 $("#3").addClass("visible");
 
                 $("#yes").on('click', () => {
@@ -184,7 +179,7 @@ function showId(id) {
 function beginCountdown() {
     let prev = "";
     let interval = setInterval(() => {
-        let dif = site.request.end_time - new Date();
+        let dif = site_data.request.end_time - new Date();
         if (dif < 0) {
             clearInterval(interval);
             location.reload();

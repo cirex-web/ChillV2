@@ -1,3 +1,6 @@
+/* global chrome */
+
+
 const Util = {
   isValidHttpUrl(string) {
     let url;
@@ -12,7 +15,6 @@ const Util = {
   },
 };
 
-/* global chrome */
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(request);
@@ -43,7 +45,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
     case "unblock_site": {
-      unblockSite(request);
+      unblockSite(request).then(res=>{sendResponse(res)});
       break;
     }
     case "check_validity": {
@@ -115,6 +117,12 @@ async function unblockSite({ URL, message }) {
 async function addRequest(url, req) {
   // console.log(url,req);
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
+  if(!blocked_sites[url]){
+    return {
+      success: false,
+      message: "This site is currently unblocked. Refresh the page to gain access"
+    }
+  }
   blocked_sites[url].request = {
     end_time: +new Date() + req.WAIT_TIME * 60 * 1000,
     message: req.TXT,

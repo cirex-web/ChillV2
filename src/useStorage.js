@@ -557,7 +557,7 @@ const getURL = function () {
     if (chrome.windows) {
       chrome.windows.getCurrent((w) => {
         chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
-          let url = new URL(tabs[0].url).origin.replace("http://", "https://");
+          let url = new URL(tabs[0].url).origin.replace("http://", "https://").replace("https://www.","https://");
           re(url);
         });
       });
