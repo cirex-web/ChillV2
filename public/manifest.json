@@ -7,7 +7,7 @@
     "scripts": ["backend/scripts/background.js"],
     "persistent": false
   },
-  "permissions": ["activeTab", "storage", "unlimitedStorage"],
+  "permissions": ["activeTab", "storage", "unlimitedStorage","tabs"],
   "browser_action": {
     "default_popup": "index.html"
   },

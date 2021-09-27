@@ -10,6 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 export const AppContext = createContext();
 function showMessage(data) {
+  data?.message?.replace("https://","");
   if (data.success) {
     toast.success(data.message);
   } else {

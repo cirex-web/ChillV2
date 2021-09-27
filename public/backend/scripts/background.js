@@ -1,6 +1,5 @@
 /* global chrome */
 
-
 const Util = {
   isValidHttpUrl(string) {
     let url;
@@ -15,8 +14,11 @@ const Util = {
   },
 };
 
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (
+  request,
+  sender,
+  sendResponse
+) {
   console.log(request);
   switch (request.type) {
     case "block_site": {
@@ -45,14 +47,30 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
     case "unblock_site": {
-      unblockSite(request).then(res=>{sendResponse(res)});
+      unblockSite(request).then((res) => {
+        sendResponse(res);
+      });
       break;
     }
-    case "check_validity": {
+    case "check_blockability": {
       let res = Util.isValidHttpUrl(request.URL);
+      checkContentScriptAlive().then(()=>{
+        //TODO:
+      });
+
       sendResponse({
         success: true,
         message: res,
+      });
+      break;
+    }
+    case "get_current_url": {
+      getCurrentUrl().then(url=>{
+
+        sendResponse({
+          success: true,
+          message: url,
+        });
       });
       break;
     }
@@ -63,6 +81,36 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
   return true;
 });
+function checkContentScriptAlive() {
+  return new Promise((re)=>{
+
+    chrome.windows.getCurrent((w) => {
+      chrome.tabs.query({ active: true, windowId: w.id }, function (tabs) {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          { greeting: "just checking if you're alive lol" },
+          function (response) {
+            console.log(response);
+            re(response);
+          }
+        );
+      });
+    });
+  });
+}
+function getCurrentUrl() {
+  return new Promise((re) => {
+    chrome.windows.getCurrent((w) => {
+      chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
+        console.log(tabs);
+        let url = new URL(tabs[0].url).origin
+          .replace("http://", "https://")
+          .replace("https://www.", "https://");
+        re(url);
+      });
+    });
+  });
+}
 function printDatabase() {
   getKeyFromStorage("blocked_sites").then((re) => console.log(re));
 }
@@ -117,11 +165,12 @@ async function unblockSite({ URL, message }) {
 async function addRequest(url, req) {
   // console.log(url,req);
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
-  if(!blocked_sites[url]){
+  if (!blocked_sites[url]) {
     return {
       success: false,
-      message: "This site is currently unblocked. Refresh the page to gain access"
-    }
+      message:
+        "This site is currently unblocked. Refresh the page to gain access",
+    };
   }
   blocked_sites[url].request = {
     end_time: +new Date() + req.WAIT_TIME * 60 * 1000,

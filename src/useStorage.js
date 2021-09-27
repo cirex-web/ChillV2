@@ -552,20 +552,7 @@ const data = {
     },
   ],
 };
-const getURL = function () {
-  return new Promise((re) => {
-    if (chrome.windows) {
-      chrome.windows.getCurrent((w) => {
-        chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
-          let url = new URL(tabs[0].url).origin.replace("http://", "https://").replace("https://www.","https://");
-          re(url);
-        });
-      });
-    } else {
-      re("https://yeet.com");
-    }
-  });
-};
+
 const useStorage = (showMessage) => {
   const [blockedSites, setBlockedSites] = useState(undefined);
   const [currentSiteUrl, setCurrentSiteUrl] = useState(undefined);
@@ -593,7 +580,7 @@ const useStorage = (showMessage) => {
         } else {
           callback({
             success: Math.random() > 0.5,
-            message: true,
+            message: "yep callback",
           });
         }
 
@@ -610,7 +597,11 @@ const useStorage = (showMessage) => {
     },
     [showMessage]
   );
-
+  const getURL = function () {
+    return new Promise((re) => {
+      sendMessage("get_current_url", {}, (data) => re(data.message));
+    });
+  };
   const getDataFromKey = function (key) {
     return new Promise((re) => {
       if (chrome.storage) {
@@ -642,7 +633,7 @@ const useStorage = (showMessage) => {
     init();
   }, []);
   useEffect(() => {
-    sendMessage("check_validity", { URL: currentSiteUrl }, (resp) => {
+    sendMessage("check_blockability", { URL: currentSiteUrl }, (resp) => {
       setSiteBlockable(resp.message);
     });
   }, [currentSiteUrl, sendMessage]);

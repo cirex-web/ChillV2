@@ -31,6 +31,7 @@ const priorities = {
   "Awaiting Approval": 3,
 };
 const useSite = (siteData) => {
+
   let url = siteData[0]?.replace("https://","");
   let { currently_blocked, date_blocked, request, reblock } = siteData[1] || {};
   url = url ?? "Loading...";
