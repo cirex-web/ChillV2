@@ -14,11 +14,7 @@ const Util = {
   },
 };
 
-chrome.runtime.onMessage.addListener(function (
-  request,
-  sender,
-  sendResponse
-) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(request);
   switch (request.type) {
     case "block_site": {
@@ -53,27 +49,19 @@ chrome.runtime.onMessage.addListener(function (
       break;
     }
     case "check_blockability": {
-      let res = Util.isValidHttpUrl(request.URL);
-      checkContentScriptAlive().then(()=>{
-        //TODO:
-      });
-
-      sendResponse({
-        success: true,
-        message: res,
-      });
-      break;
-    }
-    case "get_current_url": {
-      getCurrentUrl().then(url=>{
-
+      // let res = Util.isValidHttpUrl(request.URL);
+      checkContentScriptAlive(request.TAB_ID).then((res) => {
+        console.log(res);
         sendResponse({
           success: true,
-          message: url,
+          message: res,
         });
       });
+
+      
       break;
     }
+
     default: {
       sendResponse("Invalid request");
     }
@@ -81,34 +69,15 @@ chrome.runtime.onMessage.addListener(function (
 
   return true;
 });
-function checkContentScriptAlive() {
-  return new Promise((re)=>{
-
-    chrome.windows.getCurrent((w) => {
-      chrome.tabs.query({ active: true, windowId: w.id }, function (tabs) {
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          { greeting: "just checking if you're alive lol" },
-          function (response) {
-            console.log(response);
-            re(response);
-          }
-        );
-      });
-    });
-  });
-}
-function getCurrentUrl() {
+function checkContentScriptAlive(TAB_ID) {
   return new Promise((re) => {
-    chrome.windows.getCurrent((w) => {
-      chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
-        console.log(tabs);
-        let url = new URL(tabs[0].url).origin
-          .replace("http://", "https://")
-          .replace("https://www.", "https://");
-        re(url);
-      });
-    });
+    chrome.tabs.sendMessage(
+      TAB_ID,
+      { greeting: "just checking if you're alive lol" },
+      function (response) {
+        re(!chrome.runtime.lastError);
+      }
+    );
   });
 }
 function printDatabase() {

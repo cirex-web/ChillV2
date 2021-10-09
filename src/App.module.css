@@ -7,6 +7,7 @@
   --green-color-1: #b9f6ca;
   --green-color-2: #00c853;
   --light-gray: rgba(0, 0, 0, 0.12);
+  --very-light-gray: rgba(0, 0, 0, 0.055);
   --dark-gray: rgba(0, 0, 0, 0.5);
 
 }
@@ -254,13 +255,14 @@ button:hover {
   flex-grow: 1;
   position: relative;
   text-align: center;
-  height: 30px;
+  padding: 10px 0;
   color: rgba(0, 0, 0, 0.486);
   font-size: 15px;
 }
 .tab:hover {
   cursor: pointer;
   color: rgba(0, 0, 0, 0.664);
+  background-color: var(--very-light-gray);
 }
 
 .tab::after {

@@ -1,7 +1,7 @@
 import css from "../../App.module.css";
 import useSite from "../../useSite";
 
-const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite,siteBlockable }) => {
+const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite,siteBlockable,siteFavicon }) => {
   const { url, status, color } = useSite([siteUrl, siteData]);
   const isBlocked = !!siteData;
   // console.log(siteBlockable);
@@ -10,7 +10,7 @@ const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite,siteBlockable }) => 
       <div className={css.container}>
         <img
           className={css.faviconLarge}
-          src={`https://api.faviconkit.com/${url}/144`}
+          src={siteFavicon||`https://api.faviconkit.com/${url}/144`}
           alt=""
         />
         <div style={{ flexGrow: 1 }}>

@@ -556,6 +556,7 @@ const data = {
 const useStorage = (showMessage) => {
   const [blockedSites, setBlockedSites] = useState(undefined);
   const [currentSiteUrl, setCurrentSiteUrl] = useState(undefined);
+  const [currentSiteFavicon, setCurrentSiteFavicon] = useState(undefined);
   const [siteBlockable, setSiteBlockable] = useState(undefined);
   const listenForUpdates = () => {
     chrome.storage?.onChanged.addListener(function (changes) {
@@ -597,9 +598,22 @@ const useStorage = (showMessage) => {
     },
     [showMessage]
   );
-  const getURL = function () {
+  const getSiteMeta = function () {
     return new Promise((re) => {
-      sendMessage("get_current_url", {}, (data) => re(data.message));
+      if(!chrome.windows){
+        re({url: "google.com",favicon: ""});
+      }else{
+
+        chrome.windows.getCurrent((w) => {
+          chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
+
+            let url = new URL(tabs[0].url).origin
+              .replace("http://", "https://")
+              .replace("https://www.", "https://");
+            re({url,favicon: tabs[0].favIconUrl,id: tabs[0].id});
+          });
+        });
+      }
     });
   };
   const getDataFromKey = function (key) {
@@ -627,20 +641,23 @@ const useStorage = (showMessage) => {
   useEffect(() => {
     const init = async () => {
       setBlockedSites(await getDataFromKey("blocked_sites"));
-      setCurrentSiteUrl(await getURL());
+      let {url,favicon,id} = await getSiteMeta();
+      setCurrentSiteUrl(url);
+      setCurrentSiteFavicon(favicon);
+      sendMessage("check_blockability", {TAB_ID: id}, (resp) => {
+        setSiteBlockable(resp.message);
+      });
       listenForUpdates();
     };
     init();
-  }, []);
-  useEffect(() => {
-    sendMessage("check_blockability", { URL: currentSiteUrl }, (resp) => {
-      setSiteBlockable(resp.message);
-    });
-  }, [currentSiteUrl, sendMessage]);
+  }, [sendMessage]);
+
+
   return {
     currentSiteUrl,
     blockedSites,
     siteBlockable,
+    currentSiteFavicon,
     blockSite,
     unblockSite,
   };

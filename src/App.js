@@ -24,6 +24,7 @@ function App() {
     blockSite,
     unblockSite,
     siteBlockable,
+    currentSiteFavicon
   } = useStorage(showMessage);
   const [page, setPage] = useState(0);
 
@@ -33,6 +34,7 @@ function App() {
         return (
           <CurrentSite
             siteUrl={currentSiteUrl}
+            siteFavicon={currentSiteFavicon}
             siteData={blockedSites && blockedSites[currentSiteUrl]}
             toggleCurrentSite={(isBlocked) => {
               if (isBlocked) {
