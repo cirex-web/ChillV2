@@ -1,13 +1,13 @@
 {
   "name": "Chill - Browse With Purpose",
-  "description": "Extension that aims to reduce impulsive procrastination by forcing users to stop and re-examine the reasons they want to procrastinate.",
+  "description": "An extension that helps reduce impulsive browsing by forcing users to stop and consider before gaining access to a webpage.",
   "version": "1.0.0",
   "manifest_version": 2,
   "background": {
     "scripts": ["backend/scripts/background.js"],
     "persistent": false
   },
-  "permissions": ["activeTab", "storage", "unlimitedStorage","tabs"],
+  "permissions": ["activeTab", "storage"],
   "browser_action": {
     "default_popup": "index.html"
   },
