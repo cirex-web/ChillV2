@@ -1,25 +1,26 @@
+import Tippy from "@tippyjs/react";
 import { useContext } from "react";
 import { AppContext } from "../../App";
 import css from "../../App.module.css";
 import useSite from "../../useSite";
 
-const CurrentSite = ({ siteUrl, siteData,siteBlockable,siteFavicon }) => {
+const CurrentSite = ({ siteUrl, siteData, siteBlockable, siteFavicon }) => {
   const { url, status, color } = useSite([siteUrl, siteData]);
-  const {blockSite, unblockSite} = useContext(AppContext);
+  const { blockSite, unblockSite } = useContext(AppContext);
   const isBlocked = !!siteData;
-  let toggleCurrentSite = ()=>{
+  let toggleCurrentSite = () => {
     if (isBlocked) {
       unblockSite(url);
     } else {
       blockSite(url);
     }
-  }
+  };
   return (
     <>
       <div className={css.container}>
         <img
           className={css.faviconLarge}
-          src={siteFavicon||`https://api.faviconkit.com/${url}/144`}
+          src={siteFavicon || `https://api.faviconkit.com/${url}/144`}
           alt=""
         />
         <div style={{ flexGrow: 1 }}>
@@ -35,7 +36,12 @@ const CurrentSite = ({ siteUrl, siteData,siteBlockable,siteFavicon }) => {
           onClick={toggleCurrentSite}
           disabled={!siteBlockable}
         >
-          {isBlocked ? "Request to unblock" : "Block Site"}
+          {isBlocked ? "Unblock Site" : "Block Site"}
+          {!siteBlockable && (
+            <Tippy content={"If this is not a Chrome site, try refreshing the page."}>
+              <span className="material-icons">help_outline</span>
+            </Tippy>
+          )}
         </button>
       </div>
     </>

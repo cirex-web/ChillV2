@@ -1,0 +1,17 @@
+.popup-content{
+    border-radius: 10px;
+    animation: .4s zoom-in forwards;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+@keyframes zoom-in {
+    0%{
+        transform: scale(0);
+    }
+    100%{
+        transform: scale(100%);
+    }
+}

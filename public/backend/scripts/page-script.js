@@ -5,7 +5,7 @@
 let blocked_sites, site_data, url;
 getBlockedSites().then((res) => {
     blocked_sites = res;
-    url = new URL(location.href).origin.replace("http://", "https://").replace("https://www.","https://");
+    url = new URL(location.href).hostname;
     site_data = blocked_sites[url];
     main();
 });

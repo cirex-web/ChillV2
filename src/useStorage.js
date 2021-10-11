@@ -3,11 +3,11 @@ import { useEffect, useState, useCallback } from "react";
 
 const data = {
   blocked_sites: {
-    "https://discord.com": {
+    "discord.com": {
       currently_blocked: true,
       date_blocked: 1622587544591,
     },
-    "https://test.com": {
+    "test.com": {
       currently_blocked: true,
       date_blocked: 1622566475429,
       request: {
@@ -17,36 +17,36 @@ const data = {
         time_created: 1622566548493,
       },
     },
-    "https://x.com": {
+    "x.com": {
       currently_blocked: false,
       date_blocked: 1622494132514,
       reblock: +new Date() + 20 * 1000,
     },
-    "https://y.co": {
+    "y.co": {
       currently_blocked: true,
       date_blocked: 1622732278244,
     },
-    "https://y.c123o": {
+    "y.c123o": {
       currently_blocked: true,
       date_blocked: 1622732278244,
     },
-    "https://y.2co": {
+    "y.2co": {
       currently_blocked: true,
       date_blocked: 1622732278244,
     },
-    "https://y.123co": {
+    "y.123co": {
       currently_blocked: true,
       date_blocked: 1622732278244,
     },
-    "https://y.1co": {
+    "y.1co": {
       currently_blocked: true,
       date_blocked: 1622732278244,
     },
-    "https://y.21": {
+    "y.21": {
       currently_blocked: true,
       date_blocked: 1622732278244,
     },
-    "https://y21": {
+    y21: {
       currently_blocked: true,
       date_blocked: 1622732278244,
     },
@@ -553,7 +553,7 @@ const data = {
   ],
 };
 
-const useStorage = (showMessage) => {
+const useStorage = (showMessage, showPopup) => {
   const [blockedSites, setBlockedSites] = useState(undefined);
   const [currentSiteUrl, setCurrentSiteUrl] = useState(undefined);
   const [currentSiteFavicon, setCurrentSiteFavicon] = useState(undefined);
@@ -581,7 +581,7 @@ const useStorage = (showMessage) => {
         } else {
           callback({
             success: Math.random() > 0.5,
-            message: "yep callback",
+            message: true,
           });
         }
 
@@ -600,17 +600,13 @@ const useStorage = (showMessage) => {
   );
   const getSiteMeta = function () {
     return new Promise((re) => {
-      if(!chrome.windows){
-        re({url: "google.com",favicon: ""});
-      }else{
-
+      if (!chrome.windows) {
+        re({ url: "discord.com", favicon: "" });
+      } else {
         chrome.windows.getCurrent((w) => {
           chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
-
-            let url = new URL(tabs[0].url).origin
-              .replace("http://", "https://")
-              .replace("https://www.", "https://");
-            re({url,favicon: tabs[0].favIconUrl,id: tabs[0].id});
+            let url = new URL(tabs[0].url).hostname;
+            re({ url, favicon: tabs[0].favIconUrl, id: tabs[0].id });
           });
         });
       }
@@ -634,24 +630,31 @@ const useStorage = (showMessage) => {
     });
   };
   const unblockSite = (URL) => {
-    sendMessage("unblock_site", {
-      URL,
-    });
+    let siteEntry = blockedSites[URL];
+    if (
+      new Date() - siteEntry.date_blocked >= 24 * 60 * 60 * 1000 &&
+      +new Date() < ((siteEntry.unblock_request?.end_time)||Infinity)&&false
+    ) {
+      showPopup("unblock_request");//TODO:
+    } else {
+      sendMessage("unblock_site", {
+        URL,
+      });
+    }
   };
   useEffect(() => {
     const init = async () => {
       setBlockedSites(await getDataFromKey("blocked_sites"));
-      let {url,favicon,id} = await getSiteMeta();
+      let { url, favicon, id } = await getSiteMeta();
       setCurrentSiteUrl(url);
       setCurrentSiteFavicon(favicon);
-      sendMessage("check_blockability", {TAB_ID: id}, (resp) => {
+      sendMessage("check_blockability", { TAB_ID: id }, (resp) => {
         setSiteBlockable(resp.message);
       });
       listenForUpdates();
     };
     init();
   }, [sendMessage]);
-
 
   return {
     currentSiteUrl,

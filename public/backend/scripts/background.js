@@ -88,12 +88,18 @@ function printRequests() {
 }
 
 async function block_site(url) {
-  if (!Util.isValidHttpUrl(url)) {
-    return {
-      success: false,
-      message: "Invalid URL",
-    };
-  }
+  // if (!Util.isValidHttpUrl(url)) {
+  //   return {
+  //     success: false,
+  //     message: "Invalid URL",
+  //   };
+  // }
+  try{
+
+    url = new URL(url).hostname;
+  }catch(e){
+    //ignored
+  };
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
 
   if (!blocked_sites[url]) {
@@ -114,15 +120,22 @@ async function block_site(url) {
     // setKeyAndData("blocked_sites",blocked_sites);
     return {
       success: false,
-      message: `${url} is already chilled!`,
+      message: `${url} is already chilled`,
     };
   }
 }
 async function unblockSite({ URL, message }) {
   let sites = (await getKeyFromStorage("blocked_sites")) || {};
+  if(!sites[URL]){
+    return{
+      success: false,
+      message: `${URL} isn't blocked!`
+    }
+  }
   if (!message) {
     delete sites[URL];
   } else {
+    
     //TODO:
   }
   setKeyAndData("blocked_sites", sites);

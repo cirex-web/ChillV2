@@ -8,8 +8,8 @@ import BlockedList from "./components/pages/BlockedList";
 import Stats from "./components/pages/Stats";
 import toast, { Toaster } from "react-hot-toast";
 
-import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
+import SitePopup from "./components/misc/SitePopup";
 
 export const AppContext = createContext();
 function showMessage(data) {
@@ -20,8 +20,13 @@ function showMessage(data) {
     toast.error(data.message);
   }
 }
-function showPopup() {}
+
 function App() {
+  function showPopup(type) {
+    if (type === "unblock_request") {
+      setPopupOpen(true);
+    }
+  }
   const {
     currentSiteUrl,
     blockedSites,
@@ -29,9 +34,9 @@ function App() {
     unblockSite,
     siteBlockable,
     currentSiteFavicon,
-  } = useStorage(showMessage);
+  } = useStorage(showMessage, showPopup);
   const [page, setPage] = useState(0);
-
+  const [popupOpen, setPopupOpen] = useState(false);
   const pageComponent = (page) => {
     switch (page) {
       case 0:
@@ -63,9 +68,7 @@ function App() {
       <div style={{ overflow: "scroll", maxHeight: "300px" }}>
         {pageComponent(page)}
       </div>
-      <Popup trigger={<button> Trigger</button>} modal>
-        <div>Popup content here !!</div>
-      </Popup>
+      <SitePopup open={popupOpen} setOpen={setPopupOpen} />
     </AppContext.Provider>
   );
 }

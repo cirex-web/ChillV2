@@ -31,10 +31,8 @@ const priorities = {
   "Awaiting Approval": 3,
 };
 const useSite = (siteData) => {
-
-  let url = siteData[0]?.replace("https://","");
+  let url = siteData[0] ?? "Loading...";
   let { currently_blocked, date_blocked, request, reblock } = siteData[1] || {};
-  url = url ?? "Loading...";
 
   const time = request?.end_time || reblock;
   const [timer, setTimer] = useState(time - new Date());
@@ -78,7 +76,7 @@ const useSite = (siteData) => {
     color: colors[status],
     priority: priorities[status],
     url,
-    date_blocked
+    date_blocked,
   };
 };
 export default useSite;
