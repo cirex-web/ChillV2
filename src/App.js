@@ -8,15 +8,19 @@ import BlockedList from "./components/pages/BlockedList";
 import Stats from "./components/pages/Stats";
 import toast, { Toaster } from "react-hot-toast";
 
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
+
 export const AppContext = createContext();
 function showMessage(data) {
-  data?.message?.replace("https://","");
+  data?.message?.replace("https://", "");
   if (data.success) {
     toast.success(data.message);
   } else {
     toast.error(data.message);
   }
 }
+function showPopup() {}
 function App() {
   const {
     currentSiteUrl,
@@ -24,7 +28,7 @@ function App() {
     blockSite,
     unblockSite,
     siteBlockable,
-    currentSiteFavicon
+    currentSiteFavicon,
   } = useStorage(showMessage);
   const [page, setPage] = useState(0);
 
@@ -36,18 +40,11 @@ function App() {
             siteUrl={currentSiteUrl}
             siteFavicon={currentSiteFavicon}
             siteData={blockedSites && blockedSites[currentSiteUrl]}
-            toggleCurrentSite={(isBlocked) => {
-              if (isBlocked) {
-                unblockSite(currentSiteUrl);
-              } else {
-                blockSite(currentSiteUrl);
-              }
-            }}
             siteBlockable={siteBlockable}
           />
         );
       case 1:
-        return <BlockedList blockSite={blockSite} />;
+        return <BlockedList data={blockedSites} />;
       case 2:
         return <Stats />;
       default:
@@ -55,7 +52,7 @@ function App() {
     }
   };
   return (
-    <AppContext.Provider value={blockedSites}>
+    <AppContext.Provider value={{ blockSite, unblockSite }}>
       <Toaster position="top-right" gutter={8} />
       <div className={css.header}>
         <div className={css.mainImgContainer}>
@@ -66,6 +63,9 @@ function App() {
       <div style={{ overflow: "scroll", maxHeight: "300px" }}>
         {pageComponent(page)}
       </div>
+      <Popup trigger={<button> Trigger</button>} modal>
+        <div>Popup content here !!</div>
+      </Popup>
     </AppContext.Provider>
   );
 }

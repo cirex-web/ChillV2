@@ -1,10 +1,19 @@
+import { useContext } from "react";
+import { AppContext } from "../../App";
 import css from "../../App.module.css";
 import useSite from "../../useSite";
 
-const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite,siteBlockable,siteFavicon }) => {
+const CurrentSite = ({ siteUrl, siteData,siteBlockable,siteFavicon }) => {
   const { url, status, color } = useSite([siteUrl, siteData]);
+  const {blockSite, unblockSite} = useContext(AppContext);
   const isBlocked = !!siteData;
-  // console.log(siteBlockable);
+  let toggleCurrentSite = ()=>{
+    if (isBlocked) {
+      unblockSite(url);
+    } else {
+      blockSite(url);
+    }
+  }
   return (
     <>
       <div className={css.container}>
@@ -23,7 +32,7 @@ const CurrentSite = ({ siteUrl, siteData, toggleCurrentSite,siteBlockable,siteFa
       <div className={css.container}>
         <button
           className={css.largeButton}
-          onClick={() => toggleCurrentSite(isBlocked)}
+          onClick={toggleCurrentSite}
           disabled={!siteBlockable}
         >
           {isBlocked ? "Request to unblock" : "Block Site"}

@@ -3,8 +3,8 @@ import { AppContext } from "../../App";
 import css from "../../App.module.css";
 import SiteRow from "../misc/SiteRow";
 
-let BlockedList = ({ blockSite }) => {
-  const data = useContext(AppContext);
+let BlockedList = ({data}) => {
+  const {blockSite} = useContext(AppContext);
   const ref = useRef(null);
   let blockSiteFromInput = () => {
     if (ref.current?.value) {
