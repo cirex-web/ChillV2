@@ -21,7 +21,7 @@ let SiteRow = ({ siteEntry }) => {
         <div style={{ color: color }}>{status}</div>
       </div>
       <div className={css.rowActions}>
-        {!isNaN(timer) && (
+        {!isNaN(timer) && timer >= 0 && (
           <Tippy content={timerStr}>
             <img src="../../../assets/clock.svg" alt="clock" />
           </Tippy>

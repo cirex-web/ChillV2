@@ -1,12 +1,19 @@
 /* global chrome */
 import { useEffect, useState, useCallback } from "react";
+import SETTINGS from "./useSettings";
 
 const data = {
   blocked_sites: {
     "discord.com": {
       currently_blocked: true,
       date_blocked: 1622587544591,
+      unblock_request: {
+        end_time: 1635285506590,
+        message: "fdsg",
+        time_created: 1635199106590,
+      },
     },
+
     "test.com": {
       currently_blocked: true,
       date_blocked: 1622566475429,
@@ -632,15 +639,21 @@ const useStorage = (showMessage, showPopup) => {
   const unblockSite = (URL) => {
     let siteEntry = blockedSites[URL];
     if (
-      new Date() - siteEntry.date_blocked >= 24 * 60 * 60 * 1000 &&
-      +new Date() < ((siteEntry.unblock_request?.end_time)||Infinity)&&false
+      new Date() - siteEntry.date_blocked >= SETTINGS.GRACE_PERIOD_DURATION &&
+      +new Date() < (siteEntry.unblock_request?.end_time || Infinity)
     ) {
-      showPopup("unblock_request");//TODO:
+      showPopup("unblock_request", {
+        url: URL,
+        request: siteEntry.unblock_request,
+      });
     } else {
       sendMessage("unblock_site", {
         URL,
       });
     }
+  };
+  const sendUnblockRequest = (data) => {
+    sendMessage("send_unblock_request", data);
   };
   useEffect(() => {
     const init = async () => {
@@ -663,6 +676,7 @@ const useStorage = (showMessage, showPopup) => {
     currentSiteFavicon,
     blockSite,
     unblockSite,
+    sendUnblockRequest,
   };
 };
 export default useStorage;

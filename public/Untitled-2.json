@@ -1,0 +1,18 @@
+{
+  "test.com": {
+    "currently_blocked": true,
+    "date_blocked": 1622566475429,
+    "reblock": 12312321312312, //after request is approved
+    "request": {
+      "end_time": 1630386468493,
+      "message": "message here",
+      "reward_time": 2606640000,
+      "time_created": 1622566548493
+    },
+    "unblock_request":{
+        "time_created":1622566548493,
+        "end_time":1630386468493,
+        "message":"message here"
+    }
+  }
+}

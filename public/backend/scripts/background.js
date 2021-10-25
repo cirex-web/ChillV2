@@ -19,21 +19,21 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.type) {
     case "block_site": {
       block_site(request.URL).then((res) => {
-        printDatabase();
+        printBlockedSites();
         sendResponse(res);
       });
       break;
     }
     case "add_request": {
       addRequest(request.URL, request).then((res) => {
-        printDatabase();
+        printBlockedSites();
         sendResponse(res);
       });
       break;
     }
     case "process_request": {
       processRequest(request.URL, request.AC).then(() => {
-        printDatabase();
+        printBlockedSites();
         printRequests();
         sendResponse({
           success: true,
@@ -58,12 +58,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         });
       });
 
-      
+      break;
+    }
+    case "send_unblock_request": {
+      sendUnblockRequest(request).then(res=>{
+        sendResponse(res);
+      });
       break;
     }
 
     default: {
-      sendResponse("Invalid request");
+      sendResponse({
+        success: false,
+        message: "Invalid request",
+      });
     }
   }
 
@@ -80,7 +88,7 @@ function checkContentScriptAlive(TAB_ID) {
     );
   });
 }
-function printDatabase() {
+function printBlockedSites() {
   getKeyFromStorage("blocked_sites").then((re) => console.log(re));
 }
 function printRequests() {
@@ -94,12 +102,11 @@ async function block_site(url) {
   //     message: "Invalid URL",
   //   };
   // }
-  try{
-
+  try {
     url = new URL(url).hostname;
-  }catch(e){
+  } catch (e) {
     //ignored
-  };
+  }
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
 
   if (!blocked_sites[url]) {
@@ -124,25 +131,46 @@ async function block_site(url) {
     };
   }
 }
-async function unblockSite({ URL, message }) {
+async function unblockSite({ URL }) {
   let sites = (await getKeyFromStorage("blocked_sites")) || {};
-  if(!sites[URL]){
-    return{
+  if (!sites[URL]) {
+    return {
       success: false,
-      message: `${URL} isn't blocked!`
-    }
+      message: `${URL} isn't blocked!`,
+    };
   }
-  if (!message) {
-    delete sites[URL];
-  } else {
-    
-    //TODO:
-  }
+
+  delete sites[URL];
   setKeyAndData("blocked_sites", sites);
   return {
     success: true,
     message: `Unblocked ${URL}!`,
   };
+}
+async function sendUnblockRequest({ message, url }) {
+  let sites = (await getKeyFromStorage("blocked_sites")) || {};
+  if (!sites[url]) {
+    return {
+      success: false,
+      message: `${url} isn't blocked!`,
+    };
+  } else if (sites[url].unblock_request) {
+    return {
+      success: false,
+      message: `You've already sent an unblock request for ${url}`,
+    };
+  } else {
+    sites[url].unblock_request = {
+      time_created: +new Date(),
+      end_time: +new Date() + 24 * 60 * 60 * 1000,
+      message: message,
+    };
+    setKeyAndData("blocked_sites", sites);
+    return {
+      success: true,
+      message: `Sent an unblock request for ${url}!`,
+    };
+  }
 }
 async function addRequest(url, req) {
   // console.log(url,req);

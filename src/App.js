@@ -1,4 +1,4 @@
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useCallback } from "react";
 import useStorage from "./useStorage";
 
 import CurrentSite from "./components/pages/CurrentSite";
@@ -10,7 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 import "reactjs-popup/dist/index.css";
 import SitePopup from "./components/misc/SitePopup";
-
+import SendRequest from "./components/popup/SendRequest";
 export const AppContext = createContext();
 function showMessage(data) {
   data?.message?.replace("https://", "");
@@ -22,11 +22,8 @@ function showMessage(data) {
 }
 
 function App() {
-  function showPopup(type) {
-    if (type === "unblock_request") {
-      setPopupOpen(true);
-    }
-  }
+
+
   const {
     currentSiteUrl,
     blockedSites,
@@ -34,9 +31,25 @@ function App() {
     unblockSite,
     siteBlockable,
     currentSiteFavicon,
+    sendUnblockRequest
   } = useStorage(showMessage, showPopup);
   const [page, setPage] = useState(0);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [popupContent, setPopupContent] = useState(undefined);
+  let popupType;
+  function processPopupResult(data){
+    if(popupType==="unblock_request"){
+      sendUnblockRequest(data);
+    }
+    setPopupOpen(false);
+  }
+  function showPopup(type,data) {
+    popupType = type;
+    if (type === "unblock_request") {
+      setPopupContent(<SendRequest processResult={processPopupResult} data={data}/>);
+      setPopupOpen(true);
+    }
+  }
   const pageComponent = (page) => {
     switch (page) {
       case 0:
@@ -64,11 +77,13 @@ function App() {
           <img src="../assets/chillLogo2.png" alt="img logo" />
         </div>
       </div>
-      <NavBar page={page} setPage={setPage} />
-      <div style={{ overflow: "scroll", maxHeight: "300px" }}>
-        {pageComponent(page)}
+      <div className={css.mainContainer}>
+        <NavBar page={page} setPage={setPage} />
+        <div style={{ overflow: "scroll", maxHeight: "300px" }}>
+          {pageComponent(page)}
+        </div>
       </div>
-      <SitePopup open={popupOpen} setOpen={setPopupOpen} />
+      <SitePopup open={popupOpen} setOpen={setPopupOpen} content={popupContent} />
     </AppContext.Provider>
   );
 }

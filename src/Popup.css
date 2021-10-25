@@ -1,11 +1,40 @@
+:root{
+    --border-color: #0091ea;
+}
 .popup-content{
     border-radius: 10px;
     animation: .4s zoom-in forwards;
-    padding: 20px;
     text-align: center;
+    width: 300px;
+    box-sizing: border-box;
+    border: none;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    outline: 3px solid var(--border-color);
+    padding: 0;
+}
+.container{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap:25px;
+}
+
+.container .text{
+    display: flex;
+    flex-direction: column;
+    gap:5px;
+}
+.lowerButton {
+    background-color: white;
+    border: none;
+    outline: 2px solid var(--border-color);
+    font-size: var(--medium-font);
+    border-radius: 10px;
+    padding: 10px;
+}
+.lowerButton:hover{
+    background-color: var(--blue-color-1);
 }
 @keyframes zoom-in {
     0%{
