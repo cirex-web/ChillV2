@@ -147,28 +147,28 @@ async function unblockSite({ URL }) {
     message: `Unblocked ${URL}!`,
   };
 }
-async function sendUnblockRequest({ message, url }) {
+async function sendUnblockRequest({ MESSAGE, URL }) {
   let sites = (await getKeyFromStorage("blocked_sites")) || {};
-  if (!sites[url]) {
+  if (!sites[URL]) {
     return {
       success: false,
-      message: `${url} isn't blocked!`,
+      message: `${URL} isn't blocked!`,
     };
-  } else if (sites[url].unblock_request) {
+  } else if (sites[URL].unblock_request) {
     return {
       success: false,
-      message: `You've already sent an unblock request for ${url}`,
+      message: `You've already sent an unblock request for ${URL}`,
     };
   } else {
-    sites[url].unblock_request = {
+    sites[URL].unblock_request = {
       time_created: +new Date(),
       end_time: +new Date() + 24 * 60 * 60 * 1000,
-      message: message,
+      message: MESSAGE,
     };
     setKeyAndData("blocked_sites", sites);
     return {
       success: true,
-      message: `Sent an unblock request for ${url}!`,
+      message: `Sent an unblock request for ${URL}!`,
     };
   }
 }

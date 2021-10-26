@@ -26,7 +26,7 @@ let SiteRow = ({ siteEntry }) => {
             <img src="../../../assets/clock.svg" alt="clock" />
           </Tippy>
         )}
-        <Tippy content={"Unblock"}>
+        <Tippy content={"Permanently Unblock"}>
           <span
             className={"material-icons " + css.md20}
             onClick={() => unblockSite(url)}

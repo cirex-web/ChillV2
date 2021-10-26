@@ -1,5 +1,6 @@
 :root{
     --border-color: #0091ea;
+    --border-color-light: #80d9ff;
 }
 .popup-content{
     border-radius: 10px;
@@ -10,7 +11,7 @@
     border: none;
     display: flex;
     flex-direction: column;
-    outline: 3px solid var(--border-color);
+    /* outline: 2px solid var(--border-color-light); */
     padding: 0;
 }
 .container{
@@ -25,16 +26,34 @@
     flex-direction: column;
     gap:5px;
 }
+.buttonContainer{
+    display: flex;
+    margin-top: 10px;
+}
 .lowerButton {
     background-color: white;
     border: none;
-    outline: 2px solid var(--border-color);
+    border-top: 2px solid var(--border-color);
     font-size: var(--medium-font);
-    border-radius: 10px;
     padding: 10px;
+    flex-grow: 1;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+
 }
 .lowerButton:hover{
     background-color: var(--blue-color-1);
+}
+
+button.two:first-child{
+    border-bottom-right-radius: 0;
+
+    border-right: 1px solid var(--border-color);
+}
+button.two:nth-child(2){
+    border-bottom-left-radius: 0;
+
+    border-left: 1px solid var(--border-color);
 }
 @keyframes zoom-in {
     0%{

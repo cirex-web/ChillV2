@@ -31,20 +31,21 @@ function App() {
     unblockSite,
     siteBlockable,
     currentSiteFavicon,
-    sendUnblockRequest
+    sendUnblockRequest,
+    processUnblockRequest
   } = useStorage(showMessage, showPopup);
   const [page, setPage] = useState(0);
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupContent, setPopupContent] = useState(undefined);
-  let popupType;
-  function processPopupResult(data){
-    if(popupType==="unblock_request"){
-      sendUnblockRequest(data);
+  function processPopupResult(resp){
+    if(resp.type==="send_unblock_request"){
+      sendUnblockRequest(resp.data.url,resp.data.res);
+    }else if(resp.type==="process_unblock_request"){
+      processUnblockRequest(resp.data.url,resp.data.res);
     }
     setPopupOpen(false);
   }
   function showPopup(type,data) {
-    popupType = type;
     if (type === "unblock_request") {
       setPopupContent(<SendRequest processResult={processPopupResult} data={data}/>);
       setPopupOpen(true);

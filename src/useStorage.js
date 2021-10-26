@@ -8,8 +8,8 @@ const data = {
       currently_blocked: true,
       date_blocked: 1622587544591,
       unblock_request: {
-        end_time: 1635285506590,
-        message: "fdsg",
+        end_time: +new Date() + 5 * 1000,
+        message: "fdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsg",
         time_created: 1635199106590,
       },
     },
@@ -577,7 +577,7 @@ const useStorage = (showMessage, showPopup) => {
 
   const sendMessage = useCallback(
     (type, data, callback) => {
-      data.type = type;
+      data.TYPE = type;
       console.log("sending", type, data);
       if (!chrome.runtime) {
         if (!callback) {
@@ -638,10 +638,7 @@ const useStorage = (showMessage, showPopup) => {
   };
   const unblockSite = (URL) => {
     let siteEntry = blockedSites[URL];
-    if (
-      new Date() - siteEntry.date_blocked >= SETTINGS.GRACE_PERIOD_DURATION &&
-      +new Date() < (siteEntry.unblock_request?.end_time || Infinity)
-    ) {
+    if (new Date() - siteEntry.date_blocked >= SETTINGS.GRACE_PERIOD_DURATION) {
       showPopup("unblock_request", {
         url: URL,
         request: siteEntry.unblock_request,
@@ -652,8 +649,11 @@ const useStorage = (showMessage, showPopup) => {
       });
     }
   };
-  const sendUnblockRequest = (data) => {
-    sendMessage("send_unblock_request", data);
+  const sendUnblockRequest = (URL, MESSAGE) => {
+    sendMessage("send_unblock_request", { URL, MESSAGE });
+  };
+  const processUnblockRequest = (URL, OUTCOME) => {
+    sendMessage("process_unblock_request", { URL, OUTCOME });
   };
   useEffect(() => {
     const init = async () => {
@@ -677,6 +677,7 @@ const useStorage = (showMessage, showPopup) => {
     blockSite,
     unblockSite,
     sendUnblockRequest,
+    processUnblockRequest,
   };
 };
 export default useStorage;
