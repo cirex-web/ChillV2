@@ -662,7 +662,7 @@ const useStorage = (showMessage, showPopup) => {
       setCurrentSiteUrl(url);
       setCurrentSiteFavicon(favicon);
       sendMessage("check_blockability", { TAB_ID: id }, (resp) => {
-        setSiteBlockable(resp.message);
+        setSiteBlockable(resp.success&&resp.message);
       });
       listenForUpdates();
     };

@@ -166,10 +166,10 @@ function setUpForm() {
             sendMessage("add_request", {
                 URL: url,
                 TXT: message,
-                WAIT_TIME: time * 3,
-                TIME: time
+                TIME: time*60*1000
 
-            }).then(() => {
+            }).then((res) => {
+                console.log(res);
                 $("#q2").css("opacity", 0);
                 
             });
@@ -221,7 +221,7 @@ function createTimeString(dif) {
 
 function sendMessage(type, data) {
     return new Promise((re) => {
-        data.type = type;
+        data.TYPE = type;
         chrome.runtime.sendMessage(data, function(response) {
             re(response);
         });

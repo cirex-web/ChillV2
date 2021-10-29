@@ -13,32 +13,30 @@ const Util = {
     return url.protocol === "https:";
   },
 };
-
+const SETTINGS = {
+  //TODO:
+  REQUEST_UNBLOCK_DELAY_MULTIPLIER: 3,
+  REQUEST_PERM_UNBLOCK_DELAY: 24 * 60 * 60 * 1000,
+  GRACE_PERIOD_DURATION: 24 * 60 * 60 * 1000, // how long before you need to send a request to unblock
+};
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(request);
-  switch (request.type) {
+  switch (request.TYPE) {
     case "block_site": {
-      block_site(request.URL).then((res) => {
-        printBlockedSites();
+      block_site(request).then((res) => {
         sendResponse(res);
       });
       break;
     }
     case "add_request": {
-      addRequest(request.URL, request).then((res) => {
-        printBlockedSites();
+      addThawRequest(request).then((res) => {
         sendResponse(res);
       });
       break;
     }
     case "process_request": {
-      processRequest(request.URL, request.AC).then(() => {
-        printBlockedSites();
-        printRequests();
-        sendResponse({
-          success: true,
-          message: "request processed!",
-        });
+      processThawRequest(request).then((res) => {
+        sendResponse(res);
       });
       break;
     }
@@ -61,9 +59,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
     case "send_unblock_request": {
-      sendUnblockRequest(request).then(res=>{
+      addUnblockRequest(request).then((res) => {
         sendResponse(res);
       });
+      break;
+    }
+    case "process_unblock_request": {
+      processUnblockRequest(request).then((res) => sendResponse(res));
       break;
     }
 
@@ -95,7 +97,7 @@ function printRequests() {
   getKeyFromStorage("requests").then((re) => console.log(re));
 }
 
-async function block_site(url) {
+async function block_site({ URL }) {
   // if (!Util.isValidHttpUrl(url)) {
   //   return {
   //     success: false,
@@ -103,21 +105,21 @@ async function block_site(url) {
   //   };
   // }
   try {
-    url = new URL(url).hostname;
+    URL = new URL(URL).hostname;
   } catch (e) {
     //ignored
   }
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
 
-  if (!blocked_sites[url]) {
-    blocked_sites[url] = {
+  if (!blocked_sites[URL]) {
+    blocked_sites[URL] = {
       date_blocked: +new Date(),
       currently_blocked: true,
     };
     setKeyAndData("blocked_sites", blocked_sites);
     return {
       success: true,
-      message: `${url} has been chilled!`,
+      message: `${URL} has been chilled!`,
     };
   } else {
     // blocked_sites[url].currently_blocked = true;
@@ -127,7 +129,7 @@ async function block_site(url) {
     // setKeyAndData("blocked_sites",blocked_sites);
     return {
       success: false,
-      message: `${url} is already chilled`,
+      message: `${URL} is already chilled`,
     };
   }
 }
@@ -147,7 +149,7 @@ async function unblockSite({ URL }) {
     message: `Unblocked ${URL}!`,
   };
 }
-async function sendUnblockRequest({ MESSAGE, URL }) {
+async function addUnblockRequest({ MESSAGE, URL }) {
   let sites = (await getKeyFromStorage("blocked_sites")) || {};
   if (!sites[URL]) {
     return {
@@ -162,7 +164,7 @@ async function sendUnblockRequest({ MESSAGE, URL }) {
   } else {
     sites[URL].unblock_request = {
       time_created: +new Date(),
-      end_time: +new Date() + 24 * 60 * 60 * 1000,
+      end_time: +new Date() + SETTINGS.REQUEST_PERM_UNBLOCK_DELAY,
       message: MESSAGE,
     };
     setKeyAndData("blocked_sites", sites);
@@ -172,58 +174,88 @@ async function sendUnblockRequest({ MESSAGE, URL }) {
     };
   }
 }
-async function addRequest(url, req) {
-  // console.log(url,req);
+async function processUnblockRequest({ URL, OUTCOME }) {
+  let sites = (await getKeyFromStorage("blocked_sites")) || {};
+  if (!sites[URL]) {
+    return {
+      success: false,
+      message: `${URL} isn't blocked!`,
+    };
+  }
+  if (!sites[URL].unblock_request) {
+    return {
+      success: false,
+      message: `There is no unblock request for ${URL} to handle`,
+    };
+  }
+  if (OUTCOME) {
+    if (sites[URL].unblock_request.end_time > +new Date()) {
+      return {
+        success: false,
+        message: "Request cooldown has not finished!",
+      };
+    }
+    return await unblockSite({ URL });
+  } else {
+    delete sites[URL].unblock_request;
+    setKeyAndData("blocked_sites", sites);
+    return {
+      success: true,
+      message: `Unblock request for ${URL} cancelled!`,
+    };
+  }
+}
+async function addThawRequest({ URL, TXT, TIME }) {
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
-  if (!blocked_sites[url]) {
+  if (!blocked_sites[URL]) {
     return {
       success: false,
       message:
         "This site is currently unblocked. Refresh the page to gain access",
     };
   }
-  blocked_sites[url].request = {
-    end_time: +new Date() + req.WAIT_TIME * 60 * 1000,
-    message: req.TXT,
-    reward_time: req.TIME * 60 * 1000,
+  blocked_sites[URL].request = {
+    end_time: +new Date() + TIME * SETTINGS.REQUEST_UNBLOCK_DELAY_MULTIPLIER,
+    message: TXT,
+    reward_time: TIME,
     time_created: +new Date(),
   };
-  console.log("added request", blocked_sites[url].request);
+  console.log("added request", blocked_sites[URL].request);
   setKeyAndData("blocked_sites", blocked_sites);
   return {
     success: true,
-    message: `Added request for ${url}!`,
+    message: `Added request for ${URL}!`,
   };
 }
-async function processRequest(url, accepted) {
+async function processThawRequest({ URL, AC }) {
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
   let requests = (await getKeyFromStorage("requests")) || [];
-  let site_request = blocked_sites[url].request;
-  let ac = false;
-  if (accepted) {
-    blocked_sites[url].currently_blocked = false;
-    blocked_sites[url].reblock = +new Date() + site_request.reward_time;
-    ac = true;
-    console.log("Starting reward");
+  let site_request = blocked_sites[URL].request;
+  if (AC) {
+    blocked_sites[URL].currently_blocked = false;
+    blocked_sites[URL].reblock = +new Date() + site_request.reward_time;
     setTimeout(() => {
-      console.log("Reward over!");
-      blocked_sites[url].currently_blocked = true;
-      delete blocked_sites[url].reblock;
+      blocked_sites[URL].currently_blocked = true;
+      delete blocked_sites[URL].reblock;
       setKeyAndData("blocked_sites", blocked_sites);
     }, site_request.reward_time);
   }
-  console.log("here", site_request);
   requests.push({
-    url: url,
-    ac: ac,
+    url: URL,
+    ac: AC,
     time_earned: site_request.reward_time,
     message: site_request.message,
     time_created: site_request.time_created,
   });
-  delete blocked_sites[url].request;
+  delete blocked_sites[URL].request;
 
   setKeyAndData("blocked_sites", blocked_sites);
   setKeyAndData("requests", requests);
+
+  return {
+    success: true,
+    message: "request processed!",
+  };
 }
 function getKeyFromStorage(key) {
   return new Promise((re) => {
