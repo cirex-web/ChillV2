@@ -6,7 +6,7 @@ let SendRequest = ({ processResult, data }) => {
   const inputRef = useRef(undefined);
   const { url, request } = data;
   const { timer, timerString } = useTimer(request?.end_time);
-
+  const [ message, setMessage ] = useState( request?.message??"");
   const requestDone = timer < 0;
   return (
     <>
@@ -35,10 +35,12 @@ let SendRequest = ({ processResult, data }) => {
 
         {(!request || requestDone) && (
           <textarea
-            required
             ref={inputRef}
             disabled={request}
-            value={request?.message}
+            value={message}
+            onChange={(ev) => {
+              setMessage(ev.target.value);
+            }}
             placeholder={
               "Note: You will be able to approve/reject this request in 24 hours."
             }
@@ -49,6 +51,7 @@ let SendRequest = ({ processResult, data }) => {
         {!request ? (
           <button
             className="lowerButton"
+            disabled={message.replaceAll(" ", "") === ""}
             onClick={() => {
               processResult({
                 data: { res: inputRef.current.value, url: url },

@@ -13,7 +13,6 @@ import SitePopup from "./components/misc/SitePopup";
 import SendRequest from "./components/popup/SendRequest";
 export const AppContext = createContext();
 function showMessage(data) {
-  data?.message?.replace("https://", "");
   if (data.success) {
     toast.success(data.message);
   } else {

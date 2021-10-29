@@ -9,7 +9,8 @@ const data = {
       date_blocked: 1622587544591,
       unblock_request: {
         end_time: +new Date() + 5 * 1000,
-        message: "fdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsg",
+        message:
+          "fdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsg",
         time_created: 1635199106590,
       },
     },
@@ -576,32 +577,19 @@ const useStorage = (showMessage, showPopup) => {
   };
 
   const sendMessage = useCallback(
-    (type, data, callback) => {
+    (type, data, callback = showMessage) => {
       data.TYPE = type;
       console.log("sending", type, data);
       if (!chrome.runtime) {
-        if (!callback) {
-          showMessage({
-            success: Math.random() > 0.5,
-            message: type,
-          });
-        } else {
-          callback({
-            success: Math.random() > 0.5,
-            message: true,
-          });
-        }
+        callback({
+          success: true,
+          message: type,
+        });
 
         return;
       }
 
-      chrome.runtime.sendMessage(data, function (response) {
-        if (!callback) {
-          showMessage(response);
-        } else {
-          callback(response);
-        }
-      });
+      chrome.runtime.sendMessage(data, callback);
     },
     [showMessage]
   );
@@ -662,7 +650,7 @@ const useStorage = (showMessage, showPopup) => {
       setCurrentSiteUrl(url);
       setCurrentSiteFavicon(favicon);
       sendMessage("check_blockability", { TAB_ID: id }, (resp) => {
-        setSiteBlockable(resp.success&&resp.message);
+        setSiteBlockable(resp.success && resp.message);
       });
       listenForUpdates();
     };

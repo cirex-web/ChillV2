@@ -5,7 +5,7 @@ import css from "../../App.module.css";
 import useSite from "../../useSite";
 
 const CurrentSite = ({ siteUrl, siteData, siteBlockable, siteFavicon }) => {
-  const { url, status, color } = useSite([siteUrl, siteData]);
+  const { url, status, color,timerStr,timer } = useSite([siteUrl, siteData]);
   const { blockSite, unblockSite } = useContext(AppContext);
   const isBlocked = !!siteData;
   let toggleCurrentSite = () => {
@@ -23,12 +23,17 @@ const CurrentSite = ({ siteUrl, siteData, siteBlockable, siteFavicon }) => {
           src={siteFavicon || `https://api.faviconkit.com/${url}/144`}
           alt=""
         />
+        <div className={css.divider}></div>
         <div style={{ flexGrow: 1 }}>
           <h3>{url}</h3>
           <h2>
             is&nbsp;<span style={{ color: color }}>{status.toLowerCase()}</span>
           </h2>
         </div>
+        {/* <div className={css.divider}></div>
+        <div style={{ flexGrow: 1}}>
+          Well this 
+        </div> */}
       </div>
       <div className={css.container}>
         <button
