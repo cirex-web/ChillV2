@@ -168,6 +168,7 @@ async function addUnblockRequest({ MESSAGE, URL }) {
       time_created: +new Date(),
       end_time: +new Date() + SETTINGS.REQUEST_PERM_UNBLOCK_DELAY,
       message: MESSAGE,
+      expiry_time: 
     };
     setKeyAndData("blocked_sites", sites);
     setTimeout(() => {

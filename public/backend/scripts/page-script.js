@@ -9,7 +9,7 @@ getBlockedSites().then((res) => {
     site_data = blocked_sites[url];
     main();
 });
-
+console.log(chrome);
 
 
 function main() {
