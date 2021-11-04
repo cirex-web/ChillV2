@@ -16,9 +16,9 @@ const Util = {
 const SETTINGS = {
   //TODO:
   REQUEST_UNBLOCK_DELAY_MULTIPLIER: 3,
-  REQUEST_PERM_UNBLOCK_DELAY: 24 * 60 * 60 * 1000,
+  REQUEST_PERM_UNBLOCK_DELAY: 10 * 1000,
   GRACE_PERIOD_DURATION: 24 * 60 * 60 * 1000, // how long before you need to send a request to unblock,
-  REQUEST_UNBLOCK_EXPIRY_TIME: 10 * 1000,
+  REQUEST_UNBLOCK_EXPIRY_TIME: 24 * 60 * 60 * 1000,
   REQUEST_PERM_EXPIRY_TIME: 10 * 1000,
 };
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -164,11 +164,12 @@ async function addUnblockRequest({ MESSAGE, URL }) {
       message: `You've already sent an unblock request for ${URL}`,
     };
   } else {
+    const curTime = +new Date();
     sites[URL].unblock_request = {
-      time_created: +new Date(),
-      end_time: +new Date() + SETTINGS.REQUEST_PERM_UNBLOCK_DELAY,
+      time_created: curTime,
+      end_time: curTime + SETTINGS.REQUEST_PERM_UNBLOCK_DELAY,
       message: MESSAGE,
-      expiry_time: 
+      expiry_time: curTime + SETTINGS.REQUEST_PERM_EXPIRY_TIME,
     };
     setKeyAndData("blocked_sites", sites);
     setTimeout(() => {
@@ -220,11 +221,13 @@ async function addThawRequest({ URL, TXT, TIME }) {
         "This site is currently unblocked. Refresh the page to gain access",
     };
   }
+  const curTime = +new Date();
   blocked_sites[URL].request = {
-    end_time: +new Date() + TIME * SETTINGS.REQUEST_UNBLOCK_DELAY_MULTIPLIER,
+    end_time: curTime + TIME * SETTINGS.REQUEST_UNBLOCK_DELAY_MULTIPLIER,
     message: TXT,
     reward_time: TIME,
-    time_created: +new Date(),
+    time_created: curTime,
+    expiry_time: curTime + SETTINGS.REQUEST_UNBLOCK_EXPIRY_TIME,
   };
   console.log("added request", blocked_sites[URL].request);
   setKeyAndData("blocked_sites", blocked_sites);

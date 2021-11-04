@@ -6,7 +6,7 @@ let SendRequest = ({ processResult, data }) => {
   const inputRef = useRef(undefined);
   const { url, request } = data;
   const { timer, timerString } = useTimer(request?.end_time);
-  const [ message, setMessage ] = useState( request?.message??"");
+  const [message, setMessage] = useState(request?.message ?? "");
   const requestDone = timer < 0;
   return (
     <>
