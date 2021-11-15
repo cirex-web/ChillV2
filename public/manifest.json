@@ -1,14 +1,13 @@
 {
-  "name": "Chill - Browse With Purpose",
-  "description": "An extension that helps reduce impulsive browsing by forcing users to stop and consider before gaining access to a webpage.",
-  "version": "1.0.0",
-  "manifest_version": 2,
+  "name": "Chill - Site Blocking, Improved",
+  "description": "Never again browse sites when you don't have a reason to!",
+  "version": "1.1.0",
+  "manifest_version": 3,
   "background": {
-    "scripts": ["backend/scripts/background.js"],
-    "persistent": false
+    "service_worker": "service_worker.js"
   },
   "permissions": ["activeTab", "storage"],
-  "browser_action": {
+  "action": {
     "default_popup": "index.html"
   },
   "content_scripts": [
@@ -18,5 +17,7 @@
       "run_at": "document_start"
     }
   ],
-  "web_accessible_resources": ["*"]
+  "web_accessible_resources": [
+    { "resources": ["*"], "matches": ["<all_urls>"] }
+  ]
 }

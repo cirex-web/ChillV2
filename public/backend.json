@@ -1,0 +1,107 @@
+{
+    "discord.com": {
+        "currently_blocked": true,
+        "date_blocked": 1622587544591,
+        "request": {
+            "end_time": 1636917352474,
+            "expiry_time": 1637003752474,
+            "message": "message here",
+            "reward_time": 8,
+            "time_created": 1622566548493
+        },
+        "unblock_request": {
+            "end_time": 1636917352474,
+            "expiry_time": 1637003752474,
+            "message": "message here",
+            "time_created": 1622566548493
+        }
+    },
+    "gototub.com": {
+        "currently_blocked": true,
+        "date_blocked": 1635023600071
+    },
+    "hangouts.google.com": {
+        "currently_blocked": true,
+        "date_blocked": 1622733632876
+    },
+    "imdb.com": {
+        "currently_blocked": true,
+        "date_blocked": 1628209780042
+    },
+    "imgflip.com": {
+        "currently_blocked": true,
+        "date_blocked": 1624112907538
+    },
+    "jklm.fun": {
+        "currently_blocked": true,
+        "date_blocked": 1636658296785
+    },
+    "kurzgesagt.org": {
+        "currently_blocked": true,
+        "date_blocked": 1632613507763
+    },
+    "mail.google.com": {
+        "currently_blocked": true,
+        "date_blocked": 1636591426823
+    },
+    "mycolor.space": {
+        "currently_blocked": true,
+        "date_blocked": 1622732500711
+    },
+    "quora.com": {
+        "currently_blocked": true,
+        "date_blocked": 1626198531245
+    },
+    "reddit.com": {
+        "currently_blocked": true,
+        "date_blocked": 1623027753903
+    },
+    "test.com": {
+        "currently_blocked": true,
+        "date_blocked": 1622566475429
+    },
+    "tiktok.com": {
+        "currently_blocked": true,
+        "date_blocked": 1629405286117
+    },
+    "twitter.com": {
+        "currently_blocked": true,
+        "date_blocked": 1634505404415
+    },
+    "vimeo.com": {
+        "currently_blocked": true,
+        "date_blocked": 1626615945105
+    },
+    "w3schools.com": {
+        "currently_blocked": true,
+        "date_blocked": 1633980208603
+    },
+    "www.producthunt.com": {
+        "currently_blocked": true,
+        "date_blocked": 1635180523783
+    },
+    "www.quora.com": {
+        "currently_blocked": true,
+        "date_blocked": 1634233023352
+    },
+    "www.reddit.com": {
+        "currently_blocked": true,
+        "date_blocked": 1635017628010
+    },
+    "www.youtube.com": {
+        "currently_blocked": true,
+        "date_blocked": 1636129507263
+    },
+    "x.com": {
+        "currently_blocked": true,
+        "date_blocked": 1636064517060
+    },
+    "xkcd.com": {
+        "currently_blocked": true,
+        "date_blocked": 1626020581137
+    },
+    "y.co": {
+        "currently_blocked": true,
+        "date_blocked": 1622732278244
+    }
+}

@@ -1,5 +1,5 @@
 /* global chrome */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import SETTINGS from "./useSettings";
 
 const data = {
@@ -19,7 +19,7 @@ const data = {
       currently_blocked: true,
       date_blocked: 1622566475429,
       request: {
-        end_time: +new Date() - 20 * 1000,
+        end_time: +new Date() + 20 * 1000,
         message: "sgfdfgsdfgsdgdsfgdfsgdfgsdfgsdfgsdgsdfg",
         reward_time: 2606640000,
         time_created: 1622566548493,
@@ -566,11 +566,19 @@ const useStorage = (showMessage, showPopup) => {
   const [currentSiteUrl, setCurrentSiteUrl] = useState(undefined);
   const [currentSiteFavicon, setCurrentSiteFavicon] = useState(undefined);
   const [siteBlockable, setSiteBlockable] = useState(undefined);
+  const [latestServiceWorkerUpdate, setLatestServiceWorkerUpdate] =
+    useState(undefined);
+
+  const serviceWorkerInterval = useRef(-1);
   const listenForUpdates = () => {
     chrome.storage?.onChanged.addListener(function (changes) {
       for (let [key, { newValue }] of Object.entries(changes)) {
         if (key === "blocked_sites") {
           setBlockedSites(newValue);
+        }
+        if (key === "service_worker_alive") {
+          setLatestServiceWorkerUpdate(newValue);
+          console.log(newValue);
         }
       }
     });
@@ -593,6 +601,16 @@ const useStorage = (showMessage, showPopup) => {
     },
     [showMessage]
   );
+  useEffect(() => {
+    if (serviceWorkerInterval.current !== -1) {
+      clearInterval(serviceWorkerInterval.current);
+    }
+    serviceWorkerInterval.current = setInterval(() => {
+      sendMessage("ping", {}, () => {
+        console.log("reviving service worker");
+      });
+    }, 500);
+  }, [latestServiceWorkerUpdate, sendMessage]);
   const getSiteMeta = function () {
     return new Promise((re) => {
       if (!chrome.windows) {

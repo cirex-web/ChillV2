@@ -20,7 +20,7 @@ const CurrentSite = ({ siteUrl, siteData, siteBlockable, siteFavicon }) => {
       <div className={css.container}>
         <img
           className={css.faviconLarge}
-          src={siteFavicon || `https://api.faviconkit.com/${url}/144`}
+          src={siteFavicon || `https://www.google.com/s2/favicons?domain=${url}&sz=128`}
           alt=""
         />
         <div className={css.divider}></div>
