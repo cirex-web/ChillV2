@@ -3,8 +3,8 @@ import { AppContext } from "../../App";
 import css from "../../App.module.css";
 import SiteRow from "../misc/SiteRow";
 
-let BlockedList = ({ data }) => {
-  const { blockSite } = useContext(AppContext);
+let BlockedList = ({ blockedSites }) => {
+  const { blockSite,loaded } = useContext(AppContext);
   const ref = useRef(null);
   let blockSiteFromInput = () => {
     if (ref.current?.value) {
@@ -14,8 +14,8 @@ let BlockedList = ({ data }) => {
   };
   return (
     <>
-      <div className={css.mainHeaderContainer}>
-        <div className={css.mainHeader}>
+      <div className={css.inputContainer}>
+        <div className={css.input}>
           <input
             ref={ref}
             placeholder={"Add a site"}
@@ -27,12 +27,18 @@ let BlockedList = ({ data }) => {
           </span>
         </div>
       </div>
-
       <div className={css.container} style={{ gap: "0px" }}>
-        {Object.entries(data).map((siteEntry, i) => {
+      {loaded?
+        Object.entries(blockedSites).map((siteEntry, i) => {
           return <SiteRow siteEntry={siteEntry} key={i} />;
-        })}
+        })
+      :
+      [...Array(10)].map((_, i) => {
+        return <SiteRow siteEntry={undefined} key={i} />;
+      })
+      }
       </div>
+      
     </>
   );
 };

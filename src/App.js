@@ -30,6 +30,7 @@ function App() {
     unblockSite,
     siteBlockable,
     currentSiteFavicon,
+    loaded,
     sendUnblockRequest,
     processUnblockRequest
   } = useStorage(showMessage, showPopup);
@@ -62,7 +63,7 @@ function App() {
           />
         );
       case 1:
-        return <BlockedList data={blockedSites} />;
+        return <BlockedList blockedSites={blockedSites} />;
       case 2:
         return <Stats />;
       default:
@@ -70,11 +71,11 @@ function App() {
     }
   };
   return (
-    <AppContext.Provider value={{ blockSite, unblockSite }}>
+    <AppContext.Provider value={{ blockSite, unblockSite,loaded}}>
       <Toaster position="top-right" gutter={8} />
       <div className={css.header}>
         <div className={css.mainImgContainer}>
-          <img src="../assets/chillLogo2.png" alt="img logo" />
+          <img src="../assets/logo3.png" alt="img logo" />
         </div>
       </div>
       <div className={css.mainContainer}>

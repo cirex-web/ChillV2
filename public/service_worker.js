@@ -16,7 +16,7 @@ const Util = {
 const debug = false;
 const DAY = debug ? 10 * 1000 : 24 * 60 * 60 * 1000;
 const SETTINGS = {
-  REQUEST_UNBLOCK_DELAY_MULTIPLIER: debug?0:3,
+  REQUEST_UNBLOCK_DELAY_MULTIPLIER: debug ? 0 : 3,
   REQUEST_PERM_UNBLOCK_DELAY: DAY,
   GRACE_PERIOD_DURATION: DAY, // how long before you need to send a request to unblock,
   REQUEST_UNBLOCK_EXPIRY_TIME: DAY,
@@ -38,6 +38,8 @@ const indicateAlive = () => {
 
 const init = async () => {
   if (scriptInit) return;
+  scriptInit = true;
+
   console.log("init database timeouts at", new Date());
 
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
@@ -60,15 +62,13 @@ const init = async () => {
       }, Math.max(0, reblock - new Date()));
     }
   }
-  scriptInit = true;
   indicateAlive();
 };
 
-self.addEventListener("install", init);
+init();
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(request);
-  init();
   switch (request.TYPE) {
     case "ping": {
       sendResponse({ success: true });
@@ -304,18 +304,18 @@ async function addThawRequest({ URL, TXT, TIME }) {
 async function processThawRequest({ URL, AC }) {
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
   let requests = (await getKeyFromStorage("requests")) || [];
-  if(!blocked_sites[URL]){
+  if (!blocked_sites[URL]) {
     return {
       success: false,
-      message: "Site isn't blocked!"
-    }
+      message: "Site isn't blocked!",
+    };
   }
   let site_request = blocked_sites[URL].request;
-  if(!site_request){
+  if (!site_request) {
     return {
       success: false,
-      message: "Site request doesn't exist anymore!"
-    }
+      message: "Site request doesn't exist anymore!",
+    };
   }
   if (AC) {
     blocked_sites[URL].currently_blocked = false;

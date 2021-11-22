@@ -19,7 +19,7 @@ const useSite = (siteData) => {
 
   const {timer,timerString} = useTimer(request?.end_time || reblock);
 
-  const [status, setStatus] = useState("Loading...");
+  const [status, setStatus] = useState("");
   useEffect(() => {
     if (currently_blocked) {
       if (request) {

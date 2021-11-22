@@ -24,9 +24,9 @@ const getReadableTimeString = (time) => {
 };
 const useTimer = (endTime) => {
   const [timer, setTimer] = useState(endTime - new Date());
-
+  
   useEffect(() => {
-    if (timer && timer >= 0) {
+    if (endTime && (!timer|| timer >= 0)) {
       setTimeout(() => {
         setTimer(endTime - new Date());
       }, 100);

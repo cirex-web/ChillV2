@@ -4,6 +4,7 @@
 
 let blocked_sites, site_data, url;
 let serviceWorkerInterval = -1;
+let killed = false;
 let updateServiceWorkerInterval = () => {
   if (serviceWorkerInterval !== -1) {
     clearInterval(serviceWorkerInterval);
@@ -219,10 +220,19 @@ function createTimeString(dif) {
 }
 
 function sendMessage(type, data) {
+  if(killed)return;
   return new Promise((re) => {
     data.TYPE = type;
-    chrome.runtime.sendMessage(data, function (response) {
-      re(response);
-    });
+    try{
+
+      chrome.runtime.sendMessage(data, function (response) {
+        re(response);
+      });
+    }catch(e){
+      killed = true;
+      location.reload();
+      
+      re();
+    }
   });
 }

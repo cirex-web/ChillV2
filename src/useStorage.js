@@ -1,17 +1,20 @@
+/* eslint-disable no-restricted-globals */
 /* global chrome */
 import { useEffect, useState, useCallback, useRef } from "react";
 import SETTINGS from "./useSettings";
-
+const wait = (m) =>{
+  return new Promise(re=>setTimeout(re,m));
+}
 const data = {
   blocked_sites: {
     "discord.com": {
       currently_blocked: true,
       date_blocked: 1622587544591,
       unblock_request: {
-        end_time: +new Date() + 5 * 1000,
+        end_time: +new Date() + 50 * 1000,
         message:
           "fdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsg",
-        time_created: 1635199106590,
+        time_created: 1635199106590
       },
     },
 
@@ -19,7 +22,7 @@ const data = {
       currently_blocked: true,
       date_blocked: 1622566475429,
       request: {
-        end_time: +new Date() + 20 * 1000,
+        end_time: +new Date() + 2 * 1000,
         message: "sgfdfgsdfgsdgdsfgdfsgdfgsdfgsdfgsdgsdfg",
         reward_time: 2606640000,
         time_created: 1622566548493,
@@ -28,19 +31,25 @@ const data = {
     "x.com": {
       currently_blocked: false,
       date_blocked: 1622494132514,
-      reblock: +new Date() + 20 * 1000,
+      reblock: +new Date() + 200 * 1000,
     },
     "y.co": {
       currently_blocked: true,
       date_blocked: 1622732278244,
+      reblock: +new Date() + 200 * 1000,
+
     },
     "y.c123o": {
       currently_blocked: true,
       date_blocked: 1622732278244,
+      reblock: +new Date() + 200 * 1000,
+
     },
     "y.2co": {
       currently_blocked: true,
       date_blocked: 1622732278244,
+      reblock: +new Date() + 200 * 1000,
+
     },
     "y.123co": {
       currently_blocked: true,
@@ -570,6 +579,7 @@ const useStorage = (showMessage, showPopup) => {
     useState(undefined);
 
   const serviceWorkerInterval = useRef(-1);
+  const [loaded, setLoaded] = useState(false);
   const listenForUpdates = () => {
     chrome.storage?.onChanged.addListener(function (changes) {
       for (let [key, { newValue }] of Object.entries(changes)) {
@@ -578,7 +588,6 @@ const useStorage = (showMessage, showPopup) => {
         }
         if (key === "service_worker_alive") {
           setLatestServiceWorkerUpdate(newValue);
-          console.log(newValue);
         }
       }
     });
@@ -587,7 +596,10 @@ const useStorage = (showMessage, showPopup) => {
   const sendMessage = useCallback(
     (type, data, callback = showMessage) => {
       data.TYPE = type;
-      console.log("sending", type, data);
+      if(type!=="ping"){
+
+        console.log("sending", type, data);
+      }
       if (!chrome.runtime) {
         callback({
           success: true,
@@ -596,8 +608,11 @@ const useStorage = (showMessage, showPopup) => {
 
         return;
       }
-
-      chrome.runtime.sendMessage(data, callback);
+      try {
+        chrome.runtime.sendMessage(data, callback);
+      } catch (e) {
+        location.reload();
+      }
     },
     [showMessage]
   );
@@ -606,15 +621,13 @@ const useStorage = (showMessage, showPopup) => {
       clearInterval(serviceWorkerInterval.current);
     }
     serviceWorkerInterval.current = setInterval(() => {
-      sendMessage("ping", {}, () => {
-        console.log("reviving service worker");
-      });
+      sendMessage("ping", {}, () => {});
     }, 500);
   }, [latestServiceWorkerUpdate, sendMessage]);
   const getSiteMeta = function () {
     return new Promise((re) => {
       if (!chrome.windows) {
-        re({ url: "discord.com", favicon: "" });
+        re({ url: "test.com", favicon: "" });
       } else {
         chrome.windows.getCurrent((w) => {
           chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
@@ -626,12 +639,13 @@ const useStorage = (showMessage, showPopup) => {
     });
   };
   const getDataFromKey = function (key) {
-    return new Promise((re) => {
+    return new Promise(async (re) => {
       if (chrome.storage) {
         chrome.storage.sync.get([key], function (result) {
           re(result[key] || {});
         });
       } else {
+        // await wait(1);
         re(data[key]);
       }
     });
@@ -670,6 +684,7 @@ const useStorage = (showMessage, showPopup) => {
       sendMessage("check_blockability", { TAB_ID: id }, (resp) => {
         setSiteBlockable(resp.success && resp.message);
       });
+      setLoaded(true);
       listenForUpdates();
     };
     init();
@@ -680,6 +695,7 @@ const useStorage = (showMessage, showPopup) => {
     blockedSites,
     siteBlockable,
     currentSiteFavicon,
+    loaded,
     blockSite,
     unblockSite,
     sendUnblockRequest,
