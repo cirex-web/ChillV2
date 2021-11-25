@@ -44,7 +44,7 @@ const CurrentSite = ({ siteUrl, siteData, siteBlockable, siteFavicon }) => {
         >
           {isBlocked ? "Unblock Site" : "Block Site"}
           {!siteBlockable && (
-            <Tippy content={"If this is not a Chrome site, try refreshing the page."}>
+            <Tippy content={"This site cannot be blocked because it is (likely) a Chrome-related site."}>
               <span className={"material-icons "+css.md20}>help_outline</span>
             </Tippy>
           )}

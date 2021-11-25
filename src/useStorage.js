@@ -2,9 +2,7 @@
 /* global chrome */
 import { useEffect, useState, useCallback, useRef } from "react";
 import SETTINGS from "./useSettings";
-const wait = (m) =>{
-  return new Promise(re=>setTimeout(re,m));
-}
+
 const data = {
   blocked_sites: {
     "discord.com": {
@@ -14,7 +12,7 @@ const data = {
         end_time: +new Date() + 50 * 1000,
         message:
           "fdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsgfdsg",
-        time_created: 1635199106590
+        time_created: 1635199106590,
       },
     },
 
@@ -37,19 +35,16 @@ const data = {
       currently_blocked: true,
       date_blocked: 1622732278244,
       reblock: +new Date() + 200 * 1000,
-
     },
     "y.c123o": {
       currently_blocked: true,
       date_blocked: 1622732278244,
       reblock: +new Date() + 200 * 1000,
-
     },
     "y.2co": {
       currently_blocked: true,
       date_blocked: 1622732278244,
       reblock: +new Date() + 200 * 1000,
-
     },
     "y.123co": {
       currently_blocked: true,
@@ -596,8 +591,7 @@ const useStorage = (showMessage, showPopup) => {
   const sendMessage = useCallback(
     (type, data, callback = showMessage) => {
       data.TYPE = type;
-      if(type!=="ping"){
-
+      if (type !== "ping") {
         console.log("sending", type, data);
       }
       if (!chrome.runtime) {
@@ -624,29 +618,30 @@ const useStorage = (showMessage, showPopup) => {
       sendMessage("ping", {}, () => {});
     }, 500);
   }, [latestServiceWorkerUpdate, sendMessage]);
-  const getSiteMeta = function () {
+  const getSiteMeta = useCallback(() => {
     return new Promise((re) => {
       if (!chrome.windows) {
         re({ url: "test.com", favicon: "" });
       } else {
         chrome.windows.getCurrent((w) => {
           chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
-            let url = new URL(tabs[0].url).hostname;
-            re({ url, favicon: tabs[0].favIconUrl, id: tabs[0].id });
+            sendMessage("util_clean_url", { URL: tabs[0].url }, (url) => {
+              re({ url, favicon: tabs[0].favIconUrl, id: tabs[0].id });
+            });
           });
         });
       }
     });
-  };
+  }, [sendMessage]);
   const getDataFromKey = function (key) {
     return new Promise(async (re) => {
       if (chrome.storage) {
         chrome.storage.sync.get([key], function (result) {
-          re(result[key] || {});
+          re(result[key]);
         });
       } else {
         // await wait(1);
-        re(data[key]);
+        re({} || data[key]);
       }
     });
   };
@@ -677,7 +672,7 @@ const useStorage = (showMessage, showPopup) => {
   };
   useEffect(() => {
     const init = async () => {
-      setBlockedSites(await getDataFromKey("blocked_sites"));
+      setBlockedSites((await getDataFromKey("blocked_sites")) || {});
       let { url, favicon, id } = await getSiteMeta();
       setCurrentSiteUrl(url);
       setCurrentSiteFavicon(favicon);
@@ -688,7 +683,7 @@ const useStorage = (showMessage, showPopup) => {
       listenForUpdates();
     };
     init();
-  }, [sendMessage]);
+  }, [sendMessage, getSiteMeta]);
 
   return {
     currentSiteUrl,

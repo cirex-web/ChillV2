@@ -1,16 +1,15 @@
 /* eslint-disable no-restricted-globals */
 /* global chrome */
+
 const Util = {
-  isValidHttpUrl(string) {
-    let url;
-
+  cleanUrl: (url) => {
     try {
-      url = new URL(string);
-    } catch (_) {
-      return false;
+      url = new URL(url).hostname;
+    } catch (e) {
+      //ignored
     }
-
-    return url.protocol === "https:";
+    url = url.replace(/^(www\.)/, "");
+    return url;
   },
 };
 const debug = false;
@@ -23,24 +22,84 @@ const SETTINGS = {
   REQUEST_PERM_EXPIRY_TIME: DAY,
 };
 let originalSetTimeout = setTimeout;
-let scriptInit = false;
+
+let injectIntoAllExistingPages = () => {
+  chrome.windows.getAll(
+    {
+      populate: true,
+      windowTypes: ["normal", "app"],
+    },
+    (windows) => {
+      for (let window of windows) {
+        for (let tab of window.tabs) {
+          if (tab.discarded) continue;
+          chrome.scripting.executeScript(
+            {
+              target: { tabId: tab.id },
+              files: ["external/jquery.js"],
+            },
+            () => {
+              if (chrome.runtime.lastError) {
+                //failed to inject; likely because it is a chrome:// site
+              } else {
+                chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  files: ["backend/scripts/page-script.js"],
+                });
+              }
+            }
+          );
+        }
+      }
+    }
+  );
+};
+
+// eslint-disable-next-line no-native-reassign
 setTimeout = function (func, delay) {
   if (func !== indicateAlive) {
     console.log("timeout set with delay", delay, func);
   }
   return originalSetTimeout(func, delay);
 };
+const firstInitialize = async () =>{
+  let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
+  let requests = (await getKeyFromStorage("requests")) || [];
+  let version = (await getKeyFromStorage("version"));
+  
+  switch (version){
+    case undefined:
+      for(let url in blocked_sites){
+        let new_url = Util.cleanUrl(url);
+        if(new_url!==url){
+          let obj = blocked_sites[url];
+          delete blocked_sites[url];
+          if(!blocked_sites[new_url]){
+            blocked_sites[new_url] = obj;
+          }
+        }
+      }
+      for(let request_entry of requests){
+        request_entry.url = Util.cleanUrl(request_entry.url);
+      }
+      console.log("Storage upgraded to version 1"); //all urls are now clean
+      // falls through
+    default:
+      setKeyAndData("blocked_sites",blocked_sites);
+      setKeyAndData("requests",requests);
+      setKeyAndData("version",1);
+  }
 
+  injectIntoAllExistingPages();
+}
 const indicateAlive = () => {
   setKeyAndDataLocal("service_worker_alive", +new Date());
   setTimeout(indicateAlive, 100);
 };
 
 const init = async () => {
-  if (scriptInit) return;
-  scriptInit = true;
 
-  console.log("init database timeouts at", new Date());
+  console.log("Init database timeouts at", new Date());
 
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
   for (let [URL, { request, unblock_request, reblock }] of Object.entries(
@@ -64,18 +123,20 @@ const init = async () => {
   }
   indicateAlive();
 };
-
+self.addEventListener("install", firstInitialize);
 init();
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(request);
+  // Note: util functions just return result whereas 
+  // everything else returns an object with a success property
   switch (request.TYPE) {
     case "ping": {
       sendResponse({ success: true });
       break;
     }
     case "block_site": {
-      block_site(request).then((res) => {
+      blockSite(request).then((res) => {
         sendResponse(res);
       });
       break;
@@ -123,6 +184,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       getBlockedSites().then((res) => sendResponse(res));
       break;
     }
+    case "util_clean_url": {
+      sendResponse(Util.cleanUrl(request.URL));
+      break;
+    }
     default: {
       sendResponse({
         success: false,
@@ -145,24 +210,14 @@ function checkContentScriptAlive(TAB_ID) {
   });
 }
 async function getBlockedSites() {
-  return await getKeyFromStorage("blocked_sites");
+  return (await getKeyFromStorage("blocked_sites")) || {};
 }
 function printRequests() {
   getKeyFromStorage("requests").then((re) => console.log(re));
 }
 
-async function block_site({ URL }) {
-  // if (!Util.isValidHttpUrl(url)) {
-  //   return {
-  //     success: false,
-  //     message: "Invalid URL",
-  //   };
-  // }
-  try {
-    URL = new URL(URL).hostname;
-  } catch (e) {
-    //ignored
-  }
+async function blockSite({ URL }) {
+  URL = Util.cleanUrl(URL);
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
 
   if (!blocked_sites[URL]) {

@@ -13,7 +13,7 @@
 
   --small-font: 10px;
   --medium-font: 15px;
-  --medium-large-font: 20px;
+  --large-font: 20px;
 }
 
 ::-webkit-scrollbar {
@@ -54,7 +54,7 @@ h3 {
 }
 h2 {
   font-weight: 600;
-  font-size: var(--medium-large-font);
+  font-size: var(--large-font);
 }
 h3 {
   font-size: var(--medium-font);
@@ -103,13 +103,13 @@ button:hover {
   padding: 20px;
   gap: 15px;
   overflow-wrap: anywhere;
-  font-size: var(--medium-font);
+  font-size: var(--large-font);
 }
 .tabContainer {
   composes: container;
   padding: 0;
   gap: 0;
-  margin-bottom: var(--medium-large-font);
+  margin-bottom: var(--large-font);
 }
 .row {
   width: 100%;
@@ -151,7 +151,7 @@ button:hover {
 }
 .rowActions {
   display: none;
-  font-size: var(--medium-large-font) !important;
+  font-size: var(--large-font) !important;
 }
 .row img {
   height: 20px;
@@ -251,7 +251,7 @@ button:hover {
   border-radius: 5px;
   background-color: white;
   width: 100%;
-  font-size: var(--medium-large-font);
+  font-size: var(--large-font);
   padding: 20px;
   display: flex;
   gap: 10px;
@@ -344,7 +344,7 @@ button:hover {
 /* tab */
 .tab {
   transition: 0.2s all;
-  flex-grow: 1;
+  flex: 1 1 0px;
   position: relative;
   text-align: center;
   padding: var(--medium-font) 0;
@@ -378,12 +378,24 @@ button:hover {
   opacity: 1;
 }
 
+.placeholder{
+  text-align: center;
+  color: var(--dark-gray);
+  height: 127px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px
+}
+
 /* other */
 
 .md20 {
-  font-size: var(--medium-large-font);
+  font-size: var(--large-font);
 }
-
+.md40{
+  font-size: 40px;
+}
 /* loading elements */
 .loading h2,
 .loading h3 {
