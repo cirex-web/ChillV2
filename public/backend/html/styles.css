@@ -4,7 +4,7 @@ body {
     align-items: center;
     height: 100vh;
     width: 100vw;
-    background-color: #aee1ec;
+    background-color: #aee1ec !important;
     margin: 0;
     font-family: Optima;
     /* opacity: 1 !important; */

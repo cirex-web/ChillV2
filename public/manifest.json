@@ -1,7 +1,7 @@
 {
   "name": "Chill - Site Blocking, Improved",
-  "description": "Never again browse sites when you don't have a reason to!",
-  "version": "1.3.0",
+  "description": "Never again waste time browsing sites when you don't have a reason to!",
+  "version": "1.4.0",
   "manifest_version": 3,
   "background": {
     "service_worker": "service_worker.js"
@@ -9,7 +9,7 @@
   "permissions": ["activeTab", "storage", "scripting"],
   "host_permissions": ["<all_urls>"],
   "action": {
-    "default_popup": "index.html"
+    "default_popup": "index.html?popup=true"
   },
   "content_scripts": [
     {

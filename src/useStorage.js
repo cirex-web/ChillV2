@@ -570,19 +570,14 @@ const useStorage = (showMessage, showPopup) => {
   const [currentSiteUrl, setCurrentSiteUrl] = useState(undefined);
   const [currentSiteFavicon, setCurrentSiteFavicon] = useState(undefined);
   const [siteBlockable, setSiteBlockable] = useState(undefined);
-  const [latestServiceWorkerUpdate, setLatestServiceWorkerUpdate] =
-    useState(undefined);
 
-  const serviceWorkerInterval = useRef(-1);
+
   const [loaded, setLoaded] = useState(false);
   const listenForUpdates = () => {
     chrome.storage?.onChanged.addListener(function (changes) {
       for (let [key, { newValue }] of Object.entries(changes)) {
         if (key === "blocked_sites") {
           setBlockedSites(newValue);
-        }
-        if (key === "service_worker_alive") {
-          setLatestServiceWorkerUpdate(newValue);
         }
       }
     });
@@ -610,14 +605,7 @@ const useStorage = (showMessage, showPopup) => {
     },
     [showMessage]
   );
-  useEffect(() => {
-    if (serviceWorkerInterval.current !== -1) {
-      clearInterval(serviceWorkerInterval.current);
-    }
-    serviceWorkerInterval.current = setInterval(() => {
-      sendMessage("ping", {}, () => {});
-    }, 500);
-  }, [latestServiceWorkerUpdate, sendMessage]);
+
   const getSiteMeta = useCallback(() => {
     return new Promise((re) => {
       if (!chrome.windows) {
@@ -625,7 +613,7 @@ const useStorage = (showMessage, showPopup) => {
       } else {
         chrome.windows.getCurrent((w) => {
           chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
-            sendMessage("util_clean_url", { URL: tabs[0].url }, (url) => {
+            sendMessage("util_clean_url", { URL: tabs[0].url??"" }, (url) => {
               re({ url, favicon: tabs[0].favIconUrl, id: tabs[0].id });
             });
           });

@@ -31,8 +31,4 @@ version: 1
     url: "imgflip.com",
   }
 ]
-//local
-{
 
-  "service_worker_alive":1231231231221
-}

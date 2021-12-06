@@ -22,83 +22,115 @@ const SETTINGS = {
   REQUEST_PERM_EXPIRY_TIME: DAY,
 };
 let originalSetTimeout = setTimeout;
-
-let injectIntoAllExistingPages = () => {
-  chrome.windows.getAll(
-    {
-      populate: true,
-      windowTypes: ["normal", "app"],
-    },
-    (windows) => {
-      for (let window of windows) {
-        for (let tab of window.tabs) {
-          if (tab.discarded) continue;
-          chrome.scripting.executeScript(
-            {
-              target: { tabId: tab.id },
-              files: ["external/jquery.js"],
-            },
-            () => {
-              if (chrome.runtime.lastError) {
-                //failed to inject; likely because it is a chrome:// site
-              } else {
-                chrome.scripting.executeScript({
-                  target: { tabId: tab.id },
-                  files: ["backend/scripts/page-script.js"],
-                });
-              }
-            }
-          );
-        }
-      }
-    }
-  );
-};
-
 // eslint-disable-next-line no-native-reassign
 setTimeout = function (func, delay) {
-  if (func !== indicateAlive) {
-    console.log("timeout set with delay", delay, func);
-  }
+  console.log("timeout set with delay", delay, func);
+
   return originalSetTimeout(func, delay);
 };
-const firstInitialize = async () =>{
+
+const updateStorageVersion = async () => {
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
   let requests = (await getKeyFromStorage("requests")) || [];
-  let version = (await getKeyFromStorage("version"));
-  
-  switch (version){
+  let version = await getKeyFromStorage("version");
+
+  switch (version) {
     case undefined:
-      for(let url in blocked_sites){
+      for (let url in blocked_sites) {
         let new_url = Util.cleanUrl(url);
-        if(new_url!==url){
+        if (new_url !== url) {
           let obj = blocked_sites[url];
           delete blocked_sites[url];
-          if(!blocked_sites[new_url]){
+          if (!blocked_sites[new_url]) {
             blocked_sites[new_url] = obj;
           }
         }
       }
-      for(let request_entry of requests){
+      for (let request_entry of requests) {
         request_entry.url = Util.cleanUrl(request_entry.url);
       }
       console.log("Storage upgraded to version 1"); //all urls are now clean
-      // falls through
+    // falls through
     default:
-      setKeyAndData("blocked_sites",blocked_sites);
-      setKeyAndData("requests",requests);
-      setKeyAndData("version",1);
+      setKeyAndData("blocked_sites", blocked_sites);
+      setKeyAndData("requests", requests);
+      setKeyAndData("version", 1);
   }
-
-  injectIntoAllExistingPages();
-}
-const indicateAlive = () => {
-  setKeyAndDataLocal("service_worker_alive", +new Date());
-  setTimeout(indicateAlive, 100);
 };
 
-const init = async () => {
+const injectIntoTab = (tab, filePath) => {
+  return new Promise((re, er) => {
+    if (tab.discarded) er();
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tab.id },
+        files: [filePath],
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          //failed to inject; likely because it is a chrome:// site
+          er(chrome.runtime.lastError);
+        } else {
+          // console.log("injected", filePath, "into", tab.url);
+          re();
+        }
+      }
+    );
+  });
+};
+const getAllTabs = () => {
+  return new Promise((re) => {
+    chrome.windows.getAll(
+      {
+        populate: true,
+        windowTypes: ["normal", "app"],
+      },
+      async (windows) => {
+        let tabs = [];
+        for (let window of windows) {
+          tabs = tabs.concat(window.tabs);
+        }
+        re(tabs);
+      }
+    );
+  });
+};
 
+let injectIntoAllExistingPages = async () => {
+  let tabs = await getAllTabs();
+  for (let tab of tabs) {
+    injectIntoTab(tab, "external/jquery.js")
+      .then(() => {
+        injectIntoTab(tab, "backend/scripts/page-script.js");
+      })
+      .catch((ignored) => {});
+  }
+};
+const injectBaton = async () => {
+  const baton_id = await getKeyFromStorageLocal("baton_id");
+  if (baton_id) return;
+
+  const tabs = await getAllTabs();
+  for (let tab of tabs) {
+    try {
+      await injectIntoTab(tab, "backend/scripts/baton.js");
+      await setKeyAndDataLocal("baton_id", tab.id);
+      return;
+    } catch (e) {
+      //ignored
+    }
+  }
+  console.log("baton injection failed");
+};
+const firstInitialize = async () => {
+  // await setKeyAndDataLocal("baton_id", false);
+  await updateStorageVersion();
+  await injectIntoAllExistingPages();
+};
+// chrome.tabs.onActivated.addListener(injectBaton);
+
+
+const init = async () => {
   console.log("Init database timeouts at", new Date());
 
   let blocked_sites = (await getKeyFromStorage("blocked_sites")) || {};
@@ -121,20 +153,72 @@ const init = async () => {
       }, Math.max(0, reblock - new Date()));
     }
   }
-  indicateAlive();
 };
+
 self.addEventListener("install", firstInitialize);
 init();
 
+// baton listener
+// chrome.storage.onChanged.addListener((changes) => {
+//   for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+//     if (key === "baton_id") {
+//       console.log("baton_id: " + newValue);
+//       if(!newValue){
+//         injectBaton();
+//       }
+//     }
+//   }
+// });
+
+
+let lifeline;
+
+keepAlive();
+
+chrome.runtime.onConnect.addListener(port => {
+  if (port.name === 'keepAlive') {
+    lifeline = port;
+    setTimeout(keepAliveForced, 295e3); // 5 minutes minus 5 seconds
+    port.onDisconnect.addListener(keepAliveForced);
+  }
+});
+
+function keepAliveForced() {
+  lifeline?.disconnect();
+  lifeline = null;
+  keepAlive();
+}
+
+async function keepAlive() {
+  if (lifeline) return;
+  for (const tab of await chrome.tabs.query({ url: '*://*/*' })) {
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => chrome.runtime.connect({ name: 'keepAlive' }),
+        // `function` will become `func` in Chrome 93+
+      });
+      console.log("switched to tab",tab);
+      chrome.tabs.onUpdated.removeListener(retryOnTabUpdate);
+      return;
+    } catch (e) {}
+  }
+  chrome.tabs.onUpdated.addListener(retryOnTabUpdate);
+}
+
+async function retryOnTabUpdate(tabId, info, tab) {
+  if (info.url && /^(file|https?):/.test(info.url)) {
+    keepAlive();
+  }
+}
+
+
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log(request);
-  // Note: util functions just return result whereas 
+  // Note: util functions just return result whereas
   // everything else returns an object with a success property
   switch (request.TYPE) {
-    case "ping": {
-      sendResponse({ success: true });
-      break;
-    }
     case "block_site": {
       blockSite(request).then((res) => {
         sendResponse(res);
@@ -198,6 +282,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
   return true;
 });
+
+// chrome.tabs.onRemoved.addListener(async (id)=>{
+//   const cur_tab_id = await getKeyFromStorage("baton_tab");
+//   if(id===cur_tab_id){
+//     setKeyAndData("baton_tab",undefined);
+//   }
+// });
+
 function checkContentScriptAlive(TAB_ID) {
   return new Promise((re) => {
     chrome.tabs.sendMessage(
@@ -403,9 +495,20 @@ function getKeyFromStorage(key) {
     });
   });
 }
+function getKeyFromStorageLocal(key) {
+  return new Promise((re) => {
+    chrome.storage.local.get([key], function (result) {
+      re(result[key]);
+    });
+  });
+}
 function setKeyAndData(key, data) {
-  chrome.storage.sync.set({ [key]: data });
+  return new Promise((re) => {
+    chrome.storage.sync.set({ [key]: data }, re);
+  });
 }
 function setKeyAndDataLocal(key, data) {
-  chrome.storage.local.set({ [key]: data });
+  return new Promise((re) => {
+    chrome.storage.local.set({ [key]: data }, re);
+  });
 }

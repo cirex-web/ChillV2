@@ -5,19 +5,8 @@
 // all variables are locally scoped to prevent errors when multiple copies of the file are present
 (function () {
   let blocked_sites, site_data, url;
-  let serviceWorkerInterval = -1;
   let killed = false;
-  let updateServiceWorkerInterval = () => {
-    if (serviceWorkerInterval !== -1) {
-      clearInterval(serviceWorkerInterval);
-    }
-    serviceWorkerInterval = setInterval(() => {
-      if (document.visibilityState === "visible" || true) {
-        sendMessage("ping", {});
-      }
-    }, 500);
-  };
-  updateServiceWorkerInterval();
+
   getBlockedSites().then(async (res) => {
     blocked_sites = res;
     url = await sendMessage("util_clean_url", { URL: location.href });
@@ -59,22 +48,12 @@
           }
           blocked_sites = newValue;
         }
-        if (key === "service_worker_alive") {
-          updateServiceWorkerInterval();
-        }
       }
     });
   }
 
-  function getBlockedSites() {
-    return new Promise((re) => {
-      chrome.runtime.sendMessage(
-        { TYPE: "get_blocked_sites" },
-        function (response) {
-          re(response);
-        }
-      );
-    });
+  async function getBlockedSites() {
+    return await sendMessage("get_blocked_sites", {});
   }
 
   function siteBlocked() {
@@ -220,13 +199,21 @@
 
   function sendMessage(type, data) {
     if (killed) return;
+    let timeOut = setTimeout(() => {
+      let element = document.createElement("iframe");
+      element.setAttribute("src", chrome.runtime.getURL("index.html"));
+      element.style.display = 'none';
+      document.body.appendChild(element);
+    }, 1000);
     return new Promise((re) => {
       data.TYPE = type;
       try {
         chrome.runtime.sendMessage(data, function (response) {
+          clearTimeout(timeOut);
           re(response);
         });
       } catch (e) {
+        clearTimeout(timeOut);
         killed = true;
         if (site_data) {
           location.reload();
