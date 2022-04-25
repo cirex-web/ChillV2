@@ -220,9 +220,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // everything else returns an object with a success property
   switch (request.TYPE) {
     case "block_site": {
-      blockSite(request).then((res) => {
-        sendResponse(res);
-      });
+      blockSite(request).then(sendResponse);
       break;
     }
     case "add_request": {
@@ -269,7 +267,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
     case "util_clean_url": {
-      sendResponse(Util.cleanUrl(request.URL));
+      sendResponse({url:Util.cleanUrl(request.URL)});
       break;
     }
     default: {

@@ -1,9 +1,41 @@
 /* eslint-disable no-restricted-globals */
-/* global chrome */
-import { useEffect, useState, useCallback, useRef } from "react";
-import SETTINGS from "./useSettings";
 
-const data = {
+import { useEffect, useState, useCallback, useRef } from "react";
+import { messageData, popupData } from "./App"; //TODO: Better workaround?
+import SETTINGS from "./useSettings";
+interface siteData {
+  currently_blocked: boolean,
+  date_blocked: number,
+  reblock?: number,
+  request?: tempUnblockData,
+  unblock_request?: unblockData
+}
+interface blockedSitesData {
+  [site: string]: siteData
+}
+export interface unblockData {
+  time_created: number,
+  end_time: number,
+  expiry_time?: number,
+  message: string
+}
+interface tempUnblockData extends unblockData {
+  reward_time: number
+}
+interface requestData {
+  ac: boolean,
+  message: string,
+  time_created: number,
+  time_earned: number,
+  url: string,
+}
+interface databaseMapping { //should be up to date with the actual database
+  blocked_sites: blockedSitesData,
+  requests: requestData[]
+
+}
+
+const data: databaseMapping = {
   blocked_sites: {
     "discord.com": {
       currently_blocked: true,
@@ -565,14 +597,13 @@ const data = {
   ],
 };
 
-const useStorage = (showMessage, showPopup) => {
-  const [blockedSites, setBlockedSites] = useState(undefined);
-  const [currentSiteUrl, setCurrentSiteUrl] = useState(undefined);
-  const [currentSiteFavicon, setCurrentSiteFavicon] = useState(undefined);
-  const [siteBlockable, setSiteBlockable] = useState(undefined);
+const useStorage = (showMessage: (data: messageData) => void, showPopup: (type: string, data: popupData) => void) => {
+  const [blockedSites, setBlockedSites] = useState<blockedSitesData>({});
+  const [currentSiteUrl, setCurrentSiteUrl] = useState<string>("");
+  const [currentSiteFavicon, setCurrentSiteFavicon] = useState<string | undefined>(undefined);
+  const [siteBlockable, setSiteBlockable] = useState<boolean>(false);
 
-
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState<boolean>(false);
   const listenForUpdates = () => {
     chrome.storage?.onChanged.addListener(function (changes) {
       for (let [key, { newValue }] of Object.entries(changes)) {
@@ -584,7 +615,8 @@ const useStorage = (showMessage, showPopup) => {
   };
 
   const sendMessage = useCallback(
-    (type, data, callback = showMessage) => {
+    //TODO: data has more properties...lol do we want a concise format //TODO: change callback to a better type later (lol such a horrible workaround)
+    (type: string, data: { TYPE?: string, [x: string]: any }, callback: (data: { [x: string]: any }) => void = showMessage as any) => {
       data.TYPE = type;
       if (type !== "ping") {
         console.log("sending", type, data);
@@ -607,41 +639,40 @@ const useStorage = (showMessage, showPopup) => {
   );
 
   const getSiteMeta = useCallback(() => {
-    return new Promise((re) => {
+    return new Promise<{ url: string, favicon: string, id: number }>((re) => {
       if (!chrome.windows) {
-        re({ url: "test.com", favicon: "" });
+        re({ url: "test.com", favicon: "", id: -1 });
       } else {
         chrome.windows.getCurrent((w) => {
           chrome.tabs.query({ active: true, windowId: w.id }, (tabs) => {
-            sendMessage("util_clean_url", { URL: tabs[0].url??"" }, (url) => {
-              re({ url, favicon: tabs[0].favIconUrl, id: tabs[0].id });
+            sendMessage("util_clean_url", { URL: tabs[0].url ?? "" }, (data) => {
+
+              re({ url: data["url"], favicon: tabs[0].favIconUrl!, id: tabs[0].id ?? chrome.tabs.TAB_ID_NONE });
             });
           });
         });
       }
     });
   }, [sendMessage]);
-  const getDataFromKey = function (key) {
+  const getDataFromKey = function <T extends keyof databaseMapping>(key: T): Promise<databaseMapping[T]> {
     return new Promise(async (re) => {
       if (chrome.storage) {
         chrome.storage.sync.get([key], function (result) {
           re(result[key]);
         });
       } else {
-        // await wait(1);
-        re({} || data[key]);
+        re(data[key]);
       }
     });
   };
 
-  const blockSite = function (URL) {
-    sendMessage("block_site", {
-      URL,
-    });
+  const blockSite = function (URL: string) {
+    sendMessage("block_site", { URL });
   };
-  const unblockSite = (URL) => {
-    let siteEntry = blockedSites[URL];
-    if (new Date() - siteEntry.date_blocked >= SETTINGS.GRACE_PERIOD_DURATION) {
+  const unblockSite = (URL: string) => {
+    console.assert(blockedSites![URL]);
+    let siteEntry = blockedSites![URL];
+    if (new Date().getTime() - siteEntry.date_blocked >= SETTINGS.GRACE_PERIOD_DURATION) {
       showPopup("unblock_request", {
         url: URL,
         request: siteEntry.unblock_request,
@@ -652,10 +683,10 @@ const useStorage = (showMessage, showPopup) => {
       });
     }
   };
-  const sendUnblockRequest = (URL, MESSAGE) => {
+  const sendUnblockRequest = (URL: string, MESSAGE: string) => {
     sendMessage("send_unblock_request", { URL, MESSAGE });
   };
-  const processUnblockRequest = (URL, OUTCOME) => {
+  const processUnblockRequest = (URL: string, OUTCOME: boolean) => {
     sendMessage("process_unblock_request", { URL, OUTCOME });
   };
   useEffect(() => {

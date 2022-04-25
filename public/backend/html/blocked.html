@@ -1,49 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mate+SC&Roboto&Montserrat&Open+Sans&Source+Sans+Pro&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Mate+SC&Roboto&Montserrat&Open+Sans&Source+Sans+Pro&display=swap" rel="stylesheet">
-
-</head>
-
-<body style="opacity: 0;">
-    <img id="logo" src="https://i.ibb.co/mFjrPML/128.png">
+  <body style="opacity: 0">
+    <img id="logo" src="https://i.ibb.co/mFjrPML/128.png" />
     <!-- <img src="https://images.pexels.com/photos/572897/pexels-photo-572897.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" id="bg"> -->
 
     <div class="screen" id="1">
-        <h1>This site has been Chilled.</h1>
-        <div>
-            <div class="q" id="q1">
-                <h2>Why do you wish to enter?</h2>
-                <div><input id="next-request-input" placeholder=""><button id="next-request-button">Next!</button></div>
-            </div>
-            <div class="q" id="q2">
-                <h2>How long do you need?</h2>
-                <div>
-                    <input class="small"><div class="suffix">min</div>
-                    <button id="send-request-button">Send!</button>
-                </div>
-            </div>
+      <h1>This site has been Chilled.</h1>
+      <div>
+        <div class="q" id="q1">
+          <h2>Why do you wish to enter?</h2>
+          <div>
+            <input id="next-request-input" placeholder="" /><button
+              id="next-request-button"
+            >
+              Next!
+            </button>
+          </div>
         </div>
+        <div class="q" id="q2">
+          <h2>How long do you need?</h2>
+          <div>
+            <input class="small" />
+            <div class="suffix">min</div>
+            <button id="send-request-button">Send!</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="screen" id="2">
-        <h1 class="bigger" id="time">00:00:00</h1>
-        <p>until potential access to the site</p>
+      <h1 class="bigger" id="time">00:00:00</h1>
+      <p>until potential access to the site</p>
     </div>
     <div class="screen" id="3">
-        <h1 class="smaller">Your past self has requested to use this site with the following message: </h1>
-        <h2 id="message" class="quote"></h2>
-        <div id="decision-container">
-            <h1>Accept?</h1>
-            
-            <div class="choice" id="yes">Y</div>
-            <div class="choice" id="no">N</div>
-        </div>
-    </div>
-</body>
+      <h1 class="smaller">
+        Your past self has requested to use this site with the following
+        message:
+      </h1>
+      <h2 id="message" class="quote"></h2>
+      <div id="decision-container">
+        <h1>Accept?</h1>
 
+        <div class="choice" id="yes">Y</div>
+        <div class="choice" id="no">N</div>
+      </div>
+    </div>
+  </body>
 </html>
